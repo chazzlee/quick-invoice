@@ -1,9 +1,103 @@
 import Head from "next/head";
 import { Inter } from "@next/font/google";
+import {
+  FieldValues,
+  useFieldArray,
+  useForm,
+  UseFormRegister,
+} from "react-hook-form";
+import { FormControl } from "@/components/FormControl";
+import { Fragment } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
+type Nullable<T> = T | null;
+
+type FormData = {
+  title: string;
+  logo: Nullable<FileList>;
+  from: {
+    name: string;
+    email: string;
+    phone: string;
+    address: {
+      street: string;
+      city: string;
+      state: string;
+      zipCode: string;
+    };
+  };
+  to: {
+    name: string;
+    email: string;
+    phone: string;
+    address: {
+      street: string;
+      city: string;
+      state: string;
+      zipCode: string;
+    };
+  };
+  invoice: {
+    number: string;
+    date: Nullable<Date>;
+    terms: string;
+  };
+  lineItems: {
+    description: string;
+    details: string;
+    rate: string;
+    quantity: number;
+    amount: string;
+  }[];
+  notes: string;
+};
 
 export default function Home() {
+  const { register, control, handleSubmit } = useForm<FormData>({
+    defaultValues: {
+      title: "Invoice",
+      logo: null,
+      from: {
+        name: "",
+        email: "",
+        phone: "",
+        address: {
+          street: "",
+          city: "",
+          state: "",
+          zipCode: "",
+        },
+      },
+      to: {
+        name: "",
+        email: "",
+        phone: "",
+        address: {
+          street: "",
+          city: "",
+          state: "",
+          zipCode: "",
+        },
+      },
+      invoice: {
+        number: "INV0001",
+        date: null,
+        terms: "on_receipt",
+      },
+      lineItems: [
+        { description: "", details: "", rate: "", quantity: 0, amount: "" },
+      ],
+      notes: "",
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "lineItems",
+  });
+
+  console.log(fields);
+
   return (
     <>
       <Head>
@@ -12,10 +106,212 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>
-        <h1 className="text-3xl font-bold underline text-blue-300">HELLO</h1>
-        <button className="btn">Hello daisyUI</button>
+      <main className="container mx-auto">
+        <section className="pt-8">
+          <form
+            className="grid grid-cols-2 border-t-2 border-gray-400 shadow-md p-8"
+            onSubmit={handleSubmit((data) => console.log(data))}
+          >
+            <div className="left">
+              <FormControl label="Invoice title">
+                <input
+                  type="text"
+                  className="input input-bordered w-full max-w-xs"
+                  {...register("title")}
+                />
+              </FormControl>
+              <GeneralSection title="From" type="from" register={register} />
+
+              <div className="divider" />
+              <FormControl label="Number">
+                <input
+                  type="text"
+                  className="input input-bordered w-full max-w-xs"
+                  {...register("invoice.number")}
+                />
+              </FormControl>
+              <FormControl label="Date">
+                <input
+                  type="date"
+                  className="input input-bordered w-full max-w-xs"
+                  {...register("invoice.date")}
+                />
+              </FormControl>
+              <FormControl label="Date">
+                <select
+                  className="select select-bordered w-full max-w-xs"
+                  {...register("invoice.terms")}
+                >
+                  <option disabled>Choose terms</option>
+                  <option value="on_receipt">On Receipt</option>
+                  <option value="30_days">30 Days</option>
+                </select>
+              </FormControl>
+            </div>
+
+            <div className="right">
+              <FormControl label="Company logo">
+                <input
+                  type="file"
+                  className="file-input file-input-bordered w-full max-w-xs"
+                  {...register("logo")}
+                />
+              </FormControl>
+              <GeneralSection title="Bill to" register={register} type="to" />
+            </div>
+
+            <div className="col-span-2 border-t-2 border-gray-400 mt-4">
+              <div className="grid grid-cols-4 gap-4 mb-4 mt-2 border-b-2 border-gray-400 pb-2">
+                <p>Description</p>
+                <p>Rate</p>
+                <p>Qty</p>
+                <p>Amount</p>
+              </div>
+
+              <div className="line-items">
+                {fields.map((field, index) => (
+                  <Fragment key={field.id}>
+                    <button
+                      className="btn btn-square"
+                      onClick={() => remove(index)}
+                    >
+                      &times;
+                    </button>
+                    <div className="grid grid-cols-4 gap-4">
+                      <div>
+                        <input
+                          type="text"
+                          className="input input-bordered w-full max-w-xs"
+                          {...register(`lineItems.${index}.description`)}
+                        />
+                        <textarea
+                          className="textarea textarea-bordered w-full max-w-xs"
+                          placeholder="Additional details"
+                          {...register(`lineItems.${index}.details`)}
+                        />
+                      </div>
+
+                      <input
+                        type="text"
+                        className="input input-bordered w-full max-w-xs"
+                        {...register(`lineItems.${index}.rate`)}
+                      />
+                      <input
+                        type="text"
+                        className="input input-bordered w-full max-w-xs"
+                        {...register(`lineItems.${index}.quantity`)}
+                      />
+                      <input
+                        type="text"
+                        className="input input-bordered w-full max-w-xs"
+                        {...register(`lineItems.${index}.amount`)}
+                      />
+                    </div>
+                  </Fragment>
+                ))}
+                <button
+                  type="button"
+                  className="btn btn-square"
+                  onClick={() =>
+                    append({
+                      description: "",
+                      details: "",
+                      rate: "",
+                      quantity: 0,
+                      amount: "",
+                    })
+                  }
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <FormControl label="Notes">
+              <textarea
+                className="textarea textarea-bordered"
+                {...register("notes")}
+              />
+            </FormControl>
+            <div>
+              <button type="submit" className="btn">
+                Submit
+              </button>
+            </div>
+          </form>
+        </section>
       </main>
     </>
+  );
+}
+
+function GeneralSection({
+  title,
+  register,
+  type,
+}: {
+  title: string;
+  type: "from" | "to";
+  register: any;
+}) {
+  return (
+    <div className={`${title} pt-8`}>
+      <h3 className="text-capitalize">{title}</h3>
+      <FormControl label="Name">
+        <input
+          type="text"
+          className="input input-bordered w-full max-w-xs"
+          {...register(`${type}.name`)}
+        />
+      </FormControl>
+      <FormControl label="Email address">
+        <input
+          type="email"
+          className="input input-bordered w-full max-w-xs"
+          {...register(`${type}.email`)}
+        />
+      </FormControl>
+      <FormControl label="Phone number">
+        <input
+          type="text"
+          className="input input-bordered w-full max-w-xs"
+          {...register(`${type}.phone`)}
+        />
+      </FormControl>
+      <div className="pt-4">
+        <h4 className="text-sm">Address</h4>
+        <FormControl label="Street">
+          <input
+            type="text"
+            className="input input-bordered w-full max-w-xs"
+            {...register(`${type}.address.street`)}
+          />
+        </FormControl>
+        <FormControl label="City">
+          <input
+            type="text"
+            className="input input-bordered w-full max-w-xs"
+            {...register(`${type}.address.city`)}
+          />
+        </FormControl>
+        <FormControl label="State">
+          <select
+            className="select select-bordered w-full max-w-xs"
+            {...register(`${type}.address.state`)}
+          >
+            <option disabled>Choose state</option>
+            <option value="NJ">NJ</option>
+            <option value="NY">NY</option>
+          </select>
+        </FormControl>
+        <FormControl label="Zip code">
+          <input
+            type="text"
+            className="input input-bordered w-full max-w-xs"
+            {...register(`${type}.address.zipCode`)}
+          />
+        </FormControl>
+      </div>
+    </div>
   );
 }
