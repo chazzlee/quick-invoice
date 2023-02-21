@@ -17,7 +17,14 @@ import {
 import { Address, GeneralDetails } from "@/components/GeneralDetails";
 import { isKeyOf } from "@/utils/isKey";
 import type { Nullable } from "@/utils/types";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  ComponentPropsWithRef,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { states } from "@/utils/states";
 import { formatCurrency } from "@/utils/formatCurrency";
 
@@ -44,6 +51,7 @@ type LineItem = {
   rate: number;
   quantity: number;
   amount: number;
+  taxable: boolean;
 };
 
 type InvoiceFormData = {
@@ -55,6 +63,13 @@ type InvoiceFormData = {
   lineItems: LineItem[];
   notes: string;
   subtotal: number;
+  totalTax: number;
+  total: number;
+  tax: {
+    type: "on_total" | "none" | "deducted" | "per_item";
+    rate: number;
+  };
+  balanceDue: number;
 };
 
 const defaultGeneralDetails: GeneralDetails = {
@@ -75,11 +90,13 @@ const defaultLineItem: LineItem = {
   rate: 0,
   quantity: 1,
   amount: 0,
+  taxable: false,
 };
 
 //rate .toFormat("0,0.00")
 //amount .toFormat("$0,0.00")
 
+const SAMPLE_TAX_RATE = 0.07;
 export default function Form() {
   const { register, control, watch, getValues, setValue, handleSubmit } =
     useForm<InvoiceFormData>({
@@ -96,6 +113,10 @@ export default function Form() {
         lineItems: [defaultLineItem],
         notes: "",
         subtotal: 0,
+        total: 0,
+        totalTax: 0,
+        tax: { type: "none", rate: 0 },
+        balanceDue: 0,
       },
     });
 
@@ -106,18 +127,41 @@ export default function Form() {
     name: "lineItems",
   });
 
-  const updateSubtotal = useCallback(() => {
+  const SAMPLE_PAID = 0;
+
+  // TODO:
+  const taxRate = watch("tax.rate");
+  const isTaxable = watch("tax.type") !== "none";
+  const setTaxable = useCallback(
+    (index: number) => {
+      if (!isTaxable) {
+        setValue(`lineItems.${index}.taxable`, false);
+      } else {
+        setValue(`lineItems.${index}.taxable`, true);
+      }
+    },
+    [setValue, isTaxable]
+  );
+
+  const updateTotals = useCallback(() => {
     const lineItems = getValues("lineItems");
     const subtotal = lineItems.reduce((acc, prev) => acc + prev.amount, 0);
+    const totalTax = subtotal * (taxRate / 100); //TODO:
+    const total = totalTax + subtotal;
+    const balanceDue = total - SAMPLE_PAID; //TODO:
+
     setValue("subtotal", subtotal);
-  }, [getValues, setValue]);
+    setValue("totalTax", totalTax);
+    setValue("total", total);
+    setValue("balanceDue", balanceDue);
+  }, [getValues, setValue, taxRate]);
 
   const setAmount = useCallback(
     (index: number, amount: number) => {
       setValue(`lineItems.${index}.amount`, amount);
-      updateSubtotal();
+      updateTotals();
     },
-    [setValue, updateSubtotal]
+    [setValue, updateTotals]
   );
 
   return (
@@ -275,7 +319,10 @@ export default function Form() {
 
             <div className="my-4 line-items-container">
               <div className="flex gap-4 py-2 pl-8 border-t border-b border-gray-400">
-                <label className="w-6/12 pl-4" htmlFor="description">
+                <label
+                  className={`${isTaxable ? "w-5/12" : "w-6/12"} pl-4`}
+                  htmlFor="description"
+                >
                   Description
                 </label>
                 <label className="w-2/12 pl-2" htmlFor="rate">
@@ -287,6 +334,11 @@ export default function Form() {
                 <label className="w-2/12" htmlFor="amount">
                   Amount
                 </label>
+                {isTaxable ? (
+                  <label className="w-1/12" htmlFor="tax">
+                    Tax
+                  </label>
+                ) : null}
               </div>
               {fields.map((field, index) => (
                 <div
@@ -305,7 +357,7 @@ export default function Form() {
                       &times;
                     </button>
                   </div>
-                  <div className="w-6/12 ml-4">
+                  <div className={`${isTaxable ? "w-5/12" : "w-6/12"} ml-4`}>
                     <TextInput
                       id={`description-${index}`}
                       placeholder="Item description"
@@ -344,6 +396,16 @@ export default function Form() {
                     setAmount={setAmount}
                     amount={watch(`lineItems.${index}.amount`)}
                   />
+
+                  {isTaxable ? (
+                    <div className="w-1/12">
+                      <Taxable
+                        setTaxable={setTaxable}
+                        index={index}
+                        {...register(`lineItems.${index}.taxable`)}
+                      />
+                    </div>
+                  ) : null}
                 </div>
               ))}
             </div>
@@ -359,17 +421,23 @@ export default function Form() {
 
             <div className="grid grid-cols-2 gap-8 pt-4">
               <div className="col-start-2">
-                <div className="flex justify-between w-1/2 text-right">
+                <div className="flex justify-between w-1/2">
                   <p>Subtotal</p>
                   <p>{formatCurrency(getValues("subtotal"))}</p>
                 </div>
-                <div className="flex justify-between w-1/2 text-right">
+                {watch("tax.type") !== "none" ? (
+                  <div className="flex justify-between w-1/2">
+                    <p>Tax ({taxRate}%)</p>
+                    <p>{formatCurrency(getValues("totalTax"))}</p>
+                  </div>
+                ) : null}
+                <div className="flex justify-between w-1/2">
                   <p>Total</p>
-                  <p>$0.00</p>
+                  <p>{formatCurrency(getValues("total"))}</p>
                 </div>
                 <div className="flex justify-between w-1/2">
-                  <p>Balance Due</p>
-                  <p>$0.00</p>
+                  <p className="font-semibold">Balance Due</p>
+                  <p>{formatCurrency(getValues("balanceDue"))}</p>
                 </div>
               </div>
             </div>
@@ -394,9 +462,28 @@ export default function Form() {
           <div>
             <h3>Color</h3>
           </div>
-          <div>
-            <h3>Tax</h3>
-            {/* <TextInput {...register("")} /> */}
+
+          <div className="tax-container">
+            <h3 className="font-semibold">Tax</h3>
+            <FormControl id="tax-type" label="Type">
+              <SelectInput
+                selectOptions={[
+                  { label: "On total", value: "on_total" },
+                  { label: "Deducted", value: "deducted" },
+                  { label: "Per item", value: "per_item" },
+                  { label: "None", value: "none" },
+                ]}
+                {...register("tax.type")}
+              />
+            </FormControl>
+            {isTaxable ? (
+              <FormControl id="tax-rate" label="Rate">
+                <TextInput
+                  type="number"
+                  {...register("tax.rate", { valueAsNumber: true })}
+                />
+              </FormControl>
+            ) : null}
           </div>
         </aside>
       </section>
@@ -431,5 +518,24 @@ function Amount({
     setAmount(index, quantity * rate);
   }, [index, quantity, rate, setAmount]);
 
+  //TODO: styles
   return <p className="w-2/12">{formatCurrency(amount)}</p>;
 }
+
+type TaxableProps = ComponentPropsWithRef<"input"> & {
+  index: number;
+  setTaxable(index: number): void;
+};
+
+// TODO: BUG: when tax type === 'none', line item taxable should be false. still true
+//FIXME:!!!!
+// eslint-disable-next-line react/display-name
+const Taxable = forwardRef<HTMLInputElement, TaxableProps>(
+  ({ index, setTaxable, ...rest }, ref) => {
+    useEffect(() => {
+      setTaxable(index);
+    }, [setTaxable, index]);
+
+    return <input ref={ref} type="checkbox" className="checkbox" {...rest} />;
+  }
+);
