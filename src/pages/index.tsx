@@ -6,7 +6,7 @@ import {
   useForm,
   UseFormRegister,
 } from "react-hook-form";
-import { FormControl } from "@/components/FormControl";
+import { XFormControl } from "@/components/XXFormControl";
 import { Fragment } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -107,37 +107,37 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="container mx-auto">
-        <section className="pt-8">
+        <section>
           <form
-            className="grid grid-cols-2 border-t-2 border-gray-400 shadow-md p-8"
+            className="grid grid-cols-2 border-t-2 border-gray-400 shadow-md p-8 bg-white"
             onSubmit={handleSubmit((data) => console.log(data))}
           >
             <div className="left">
-              <FormControl label="Invoice title">
+              <XFormControl label="Invoice title">
                 <input
                   type="text"
                   className="input input-bordered w-full max-w-xs"
                   {...register("title")}
                 />
-              </FormControl>
+              </XFormControl>
               <GeneralSection title="From" type="from" register={register} />
 
               <div className="divider" />
-              <FormControl label="Number">
+              <XFormControl label="Number">
                 <input
                   type="text"
                   className="input input-bordered w-full max-w-xs"
                   {...register("invoice.number")}
                 />
-              </FormControl>
-              <FormControl label="Date">
+              </XFormControl>
+              <XFormControl label="Date">
                 <input
                   type="date"
                   className="input input-bordered w-full max-w-xs"
                   {...register("invoice.date")}
                 />
-              </FormControl>
-              <FormControl label="Date">
+              </XFormControl>
+              <XFormControl label="Date">
                 <select
                   className="select select-bordered w-full max-w-xs"
                   {...register("invoice.terms")}
@@ -146,17 +146,17 @@ export default function Home() {
                   <option value="on_receipt">On Receipt</option>
                   <option value="30_days">30 Days</option>
                 </select>
-              </FormControl>
+              </XFormControl>
             </div>
 
             <div className="right">
-              <FormControl label="Company logo">
+              <XFormControl label="Company logo">
                 <input
                   type="file"
                   className="file-input file-input-bordered w-full max-w-xs"
                   {...register("logo")}
                 />
-              </FormControl>
+              </XFormControl>
               <GeneralSection title="Bill to" register={register} type="to" />
             </div>
 
@@ -227,12 +227,12 @@ export default function Home() {
               </div>
             </div>
 
-            <FormControl label="Notes">
+            <XFormControl label="Notes">
               <textarea
                 className="textarea textarea-bordered"
                 {...register("notes")}
               />
-            </FormControl>
+            </XFormControl>
             <div>
               <button type="submit" className="btn">
                 Submit
@@ -257,44 +257,44 @@ function GeneralSection({
   return (
     <div className={`${title} pt-8`}>
       <h3 className="text-capitalize">{title}</h3>
-      <FormControl label="Name">
+      <XFormControl label="Name">
         <input
           type="text"
           className="input input-bordered w-full max-w-xs"
           {...register(`${type}.name`)}
         />
-      </FormControl>
-      <FormControl label="Email address">
+      </XFormControl>
+      <XFormControl label="Email address">
         <input
           type="email"
           className="input input-bordered w-full max-w-xs"
           {...register(`${type}.email`)}
         />
-      </FormControl>
-      <FormControl label="Phone number">
+      </XFormControl>
+      <XFormControl label="Phone number">
         <input
           type="text"
           className="input input-bordered w-full max-w-xs"
           {...register(`${type}.phone`)}
         />
-      </FormControl>
+      </XFormControl>
       <div className="pt-4">
         <h4 className="text-sm">Address</h4>
-        <FormControl label="Street">
+        <XFormControl label="Street">
           <input
             type="text"
             className="input input-bordered w-full max-w-xs"
             {...register(`${type}.address.street`)}
           />
-        </FormControl>
-        <FormControl label="City">
+        </XFormControl>
+        <XFormControl label="City">
           <input
             type="text"
             className="input input-bordered w-full max-w-xs"
             {...register(`${type}.address.city`)}
           />
-        </FormControl>
-        <FormControl label="State">
+        </XFormControl>
+        <XFormControl label="State">
           <select
             className="select select-bordered w-full max-w-xs"
             {...register(`${type}.address.state`)}
@@ -303,14 +303,14 @@ function GeneralSection({
             <option value="NJ">NJ</option>
             <option value="NY">NY</option>
           </select>
-        </FormControl>
-        <FormControl label="Zip code">
+        </XFormControl>
+        <XFormControl label="Zip code">
           <input
             type="text"
             className="input input-bordered w-full max-w-xs"
             {...register(`${type}.address.zipCode`)}
           />
-        </FormControl>
+        </XFormControl>
       </div>
     </div>
   );
