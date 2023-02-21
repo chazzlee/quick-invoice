@@ -1,17 +1,22 @@
 import { useFieldArray, useForm } from "react-hook-form";
-import { FormControl } from "@/components/FormControl";
-import { Address, GeneralDetails } from "@/components/GeneralDetails";
-type Nullable<T> = T | null;
+import {
+  FormControl,
+  FileInput,
+  SelectInput,
+  TextInput,
+  Textarea,
+} from "@/components/Inputs";
 
-function isKey<T extends {}>(x: T, k: PropertyKey): k is keyof T {
-  return k in x;
-}
+import { Address, GeneralDetails } from "@/components/GeneralDetails";
+import { isKey } from "@/utils/isKey";
+import type { Nullable } from "@/utils/types";
 
 type InvoiceDetails = {
   number: string;
   date: Nullable<Date>;
   terms: string;
 };
+
 type GeneralDetails = {
   name: string;
   email: string;
@@ -95,12 +100,9 @@ export default function Form() {
           >
             <div className="grid grid-cols-2 gap-8">
               <div className="from">
-                <FormControl
-                  id="title"
-                  label="Invoice title"
-                  inputSize="md"
-                  {...register("title")}
-                />
+                <FormControl id="title" label="Invoice title">
+                  <TextInput {...register("title")} />
+                </FormControl>
                 <GeneralDetails title="From">
                   {Object.keys(defaultGeneralDetails).map((detail) => {
                     if (
@@ -110,56 +112,52 @@ export default function Form() {
                       return (
                         <FormControl
                           key={`from-${detail}`}
-                          id={detail}
+                          id={`from-${detail}`}
                           label={detail}
-                          {...register(`from.${detail}`)}
-                        />
+                        >
+                          <TextInput
+                            {...register(`from.${detail}`)}
+                            type={detail === "email" ? "email" : "text"}
+                          />
+                        </FormControl>
                       );
                     }
                     return null;
                   })}
                 </GeneralDetails>
                 <Address>
-                  <FormControl
-                    id="from-street"
-                    label="Street"
-                    {...register("from.address.street")}
-                  />
-                  <FormControl
-                    id="from-city"
-                    label="City"
-                    {...register("from.address.city")}
-                  />
+                  <FormControl id="from-street" label="Street">
+                    <TextInput {...register("from.address.street")} />
+                  </FormControl>
+                  <FormControl id="from-city" label="City">
+                    <TextInput {...register("from.address.city")} />
+                  </FormControl>
                   <div className="flex">
-                    <FormControl id="from-state" label="State" name="">
-                      <select
-                        className="w-1/2 select select-bordered select-md"
+                    <FormControl id="from-state" label="State">
+                      <SelectInput
+                        selectOptions={[
+                          { label: "State", value: "", disabled: true },
+                          { label: "NJ", value: "NJ" },
+                          { label: "NY", value: "NY" },
+                          { label: "MA", value: "MA" },
+                        ]}
                         {...register("from.address.state")}
-                      >
-                        <option disabled>Choose state</option>
-                        <option value="NJ">NJ</option>
-                        <option value="NY">NY</option>
-                      </select>
+                      />
                     </FormControl>
-                    <FormControl
-                      id="from-zipCode"
-                      label="Zip code"
-                      classes={["w-1/2"]}
-                      {...register("from.address.zipCode")}
-                    />
+                    <FormControl id="from-zipCode" label="Zip code">
+                      <TextInput
+                        width="w-1/2"
+                        {...register("from.address.zipCode")}
+                      />
+                    </FormControl>
                   </div>
                 </Address>
               </div>
 
               <div className="to">
-                <div className="pt-8">
-                  <input
-                    id="logo"
-                    type="file"
-                    className={"file-input file-input-bordered"}
-                    {...register("logo")}
-                  />
-                </div>
+                <FormControl id="logo" label="Company logo">
+                  <FileInput {...register("logo")} />
+                </FormControl>
                 <GeneralDetails title="To">
                   {Object.keys(defaultGeneralDetails).map((detail) => {
                     if (
@@ -169,43 +167,44 @@ export default function Form() {
                       return (
                         <FormControl
                           key={`to-${detail}`}
-                          id={detail}
+                          id={`to-${detail}`}
                           label={detail}
-                          {...register(`to.${detail}`)}
-                        />
+                        >
+                          <TextInput
+                            {...register(`to.${detail}`)}
+                            type={detail === "email" ? "email" : "text"}
+                          />
+                        </FormControl>
                       );
                     }
                     return null;
                   })}
                 </GeneralDetails>
                 <Address>
-                  <FormControl
-                    id="to-street"
-                    label="Street"
-                    {...register("to.address.street")}
-                  />
-                  <FormControl
-                    id="to-city"
-                    label="City"
-                    {...register("to.address.city")}
-                  />
+                  <FormControl id="to-street" label="Street">
+                    <TextInput {...register("to.address.street")} />
+                  </FormControl>
+                  <FormControl id="to-city" label="City">
+                    <TextInput {...register("to.address.city")} />
+                  </FormControl>
                   <div className="flex">
-                    <FormControl id="to-state" label="State" name="">
-                      <select
-                        className="w-1/2 select select-bordered select-md"
+                    <FormControl id="to-state" label="State">
+                      <SelectInput
+                        selectOptions={[
+                          { label: "State", value: "", disabled: true },
+                          { label: "NJ", value: "NJ" },
+                          { label: "NY", value: "NY" },
+                          { label: "MA", value: "MA" },
+                        ]}
                         {...register("to.address.state")}
-                      >
-                        <option disabled>Choose state</option>
-                        <option value="NJ">NJ</option>
-                        <option value="NY">NY</option>
-                      </select>
+                      />
                     </FormControl>
-                    <FormControl
-                      id="to-zipCode"
-                      label="Zip code"
-                      classes={["w-1/2"]}
-                      {...register("to.address.zipCode")}
-                    />
+                    <FormControl id="to-zipCode" label="Zip code">
+                      <TextInput
+                        width="w-1/2"
+                        {...register("to.address.zipCode")}
+                      />
+                    </FormControl>
                   </div>
                 </Address>
               </div>
@@ -215,37 +214,33 @@ export default function Form() {
               <div className="divider" />
               <div className="grid grid-cols-2 gap-8">
                 <div>
-                  <FormControl
-                    id="invoice-number"
-                    label="Number"
-                    {...register("invoice.number")}
-                  />
-                  <FormControl
-                    id="invoice-date"
-                    type="date"
-                    label="Date"
-                    {...register("invoice.date")}
-                  />
-
-                  <div className="form-control">
-                    <label htmlFor="invoice-terms" className="label">
-                      <span className="capitalize label-text-alt">Terms</span>
-                    </label>
-                    <select
-                      className="w-full max-w-xs select select-bordered select-md"
+                  <FormControl id="invoice-number" label="Number">
+                    <TextInput width="w-1/2" {...register("invoice.number")} />
+                  </FormControl>
+                  <FormControl id="invoice-date" label="Date">
+                    <TextInput
+                      type="date"
+                      width="w-1/2"
+                      {...register("invoice.date")}
+                    />
+                  </FormControl>
+                  <FormControl id="invoice-terms" label="Terms">
+                    <SelectInput
+                      selectOptions={[
+                        { value: "", label: "Choose terms", disabled: true },
+                        { value: "on_receipt", label: "On receipt" },
+                        { value: "30_days", label: "30 days" },
+                        { value: "60_days", label: "60 days" },
+                      ]}
                       {...register("invoice.terms")}
-                    >
-                      <option disabled>Choose terms</option>
-                      <option value="on_receipt">On Receipt</option>
-                      <option value="30_days">30 Days</option>
-                    </select>
-                  </div>
+                    />
+                  </FormControl>
                 </div>
               </div>
             </div>
 
             <div className="my-4 line-items-container">
-              <div className="flex gap-4 py-2 pl-8 border-t border-b border-gray">
+              <div className="flex gap-4 py-2 pl-8 border-t border-b border-gray-400">
                 <label className="w-6/12 pl-4" htmlFor="description">
                   Description
                 </label>
@@ -276,27 +271,34 @@ export default function Form() {
                     </button>
                   </div>
                   <div className="w-6/12 ml-4">
-                    <input
-                      id="description"
-                      className="w-full input input-sm input-bordered"
+                    <TextInput
+                      id={`description-${index}`}
                       placeholder="Item description"
+                      inputSize="sm"
                       {...register(`lineItems.${index}.description`)}
                     />
-                    <textarea
-                      className="w-full h-24 px-3 mt-2 resize-none textarea textarea-bordered"
+                    <Textarea
+                      id={`details-${index}`}
                       placeholder="Additional details"
+                      {...register(`lineItems.${index}.details`)}
                     />
                   </div>
-                  <input
-                    className="w-2/12 input input-sm input-bordered"
+                  <TextInput
+                    id={`rate-${index}`}
+                    inputSize="sm"
+                    width="w-2/12"
                     {...register(`lineItems.${index}.rate`)}
                   />
-                  <input
-                    className="w-2/12 input input-sm input-bordered"
+                  <TextInput
+                    id={`quantity-${index}`}
+                    inputSize="sm"
+                    width="w-2/12"
                     {...register(`lineItems.${index}.quantity`)}
                   />
-                  <input
-                    className="w-2/12 pl-0 input input-sm"
+                  <TextInput
+                    id={`amount-${index}`}
+                    inputSize="sm"
+                    width="w-2/12"
                     {...register(`lineItems.${index}.amount`)}
                   />
                 </div>
@@ -312,8 +314,7 @@ export default function Form() {
             </div>
 
             <div className="grid grid-cols-2 gap-8 pt-4">
-              <div />
-              <div>
+              <div className="col-start-2">
                 <div className="flex justify-between w-1/2 text-right">
                   <p>Subtotal</p>
                   <p>$0.00</p>
@@ -329,9 +330,18 @@ export default function Form() {
               </div>
             </div>
 
+            <div className="notes-container">
+              <FormControl id="notes" label="Notes">
+                <Textarea
+                  placeholder="Notes - additional terms and conditions"
+                  {...register("notes")}
+                />
+              </FormControl>
+            </div>
+
             <div className="py-8">
               <button type="submit" className="btn">
-                Generate PDF
+                Preview PDF
               </button>
             </div>
           </form>
