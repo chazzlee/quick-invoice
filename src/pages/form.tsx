@@ -5,7 +5,7 @@ import {
   useForm,
   useWatch,
 } from "react-hook-form";
-import Money, { type Dinero } from "dinero.js";
+// import Money, { type Dinero } from "dinero.js";
 
 import {
   FormControl,
@@ -17,9 +17,9 @@ import {
 import { Address, GeneralDetails } from "@/components/GeneralDetails";
 import { isKeyOf } from "@/utils/isKey";
 import type { Nullable } from "@/utils/types";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { states } from "@/utils/states";
-import { SelectOption } from "@/components/Inputs/SelectInput";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 type InvoiceDetails = {
   number: string;
@@ -41,9 +41,9 @@ type GeneralDetails = {
 type LineItem = {
   description: string;
   details: string;
-  rate: string;
+  rate: number;
   quantity: number;
-  amount: Dinero;
+  amount: number;
 };
 
 type InvoiceFormData = {
@@ -54,6 +54,7 @@ type InvoiceFormData = {
   invoice: InvoiceDetails;
   lineItems: LineItem[];
   notes: string;
+  subtotal: number;
 };
 
 const defaultGeneralDetails: GeneralDetails = {
@@ -71,16 +72,16 @@ const defaultGeneralDetails: GeneralDetails = {
 const defaultLineItem: LineItem = {
   description: "",
   details: "",
-  rate: Money({ amount: 0, precision: 2 }).toFormat("0,0.00"),
+  rate: 0,
   quantity: 1,
-  amount: Money({ amount: 0, precision: 2 }),
+  amount: 0,
 };
 
 //rate .toFormat("0,0.00")
 //amount .toFormat("$0,0.00")
 
 export default function Form() {
-  const { register, control, watch, setValue, handleSubmit } =
+  const { register, control, watch, getValues, setValue, handleSubmit } =
     useForm<InvoiceFormData>({
       defaultValues: {
         title: "Invoice",
@@ -94,6 +95,7 @@ export default function Form() {
         },
         lineItems: [defaultLineItem],
         notes: "",
+        subtotal: 0,
       },
     });
 
@@ -103,6 +105,20 @@ export default function Form() {
     control,
     name: "lineItems",
   });
+
+  const updateSubtotal = useCallback(() => {
+    const lineItems = getValues("lineItems");
+    const subtotal = lineItems.reduce((acc, prev) => acc + prev.amount, 0);
+    setValue("subtotal", subtotal);
+  }, [getValues, setValue]);
+
+  const setAmount = useCallback(
+    (index: number, amount: number) => {
+      setValue(`lineItems.${index}.amount`, amount);
+      updateSubtotal();
+    },
+    [setValue, updateSubtotal]
+  );
 
   return (
     <main className="container mx-auto">
@@ -174,6 +190,8 @@ export default function Form() {
                       src={URL.createObjectURL(companyLogo?.[0])}
                       alt="Company logo"
                       className="object-contain w-full h-full"
+                      width={80}
+                      height={80}
                       onLoad={(e) => URL.revokeObjectURL(e.currentTarget.src)}
                     />
                   )}
@@ -302,23 +320,30 @@ export default function Form() {
                   </div>
                   <TextInput
                     id={`rate-${index}`}
+                    type="number"
+                    min={0}
                     inputSize="sm"
                     width="w-2/12"
-                    {...register(`lineItems.${index}.rate`)}
+                    {...register(`lineItems.${index}.rate`, {
+                      valueAsNumber: true,
+                    })}
                   />
                   <TextInput
                     id={`quantity-${index}`}
+                    type="number"
+                    min={0}
                     inputSize="sm"
                     width="w-2/12"
-                    {...register(`lineItems.${index}.quantity`)}
+                    {...register(`lineItems.${index}.quantity`, {
+                      valueAsNumber: true,
+                    })}
                   />
-                  <Amount control={control} index={index} />
-                  {/* <TextInput
-                    id={`amount-${index}`}
-                    inputSize="sm"
-                    width="w-2/12"
-                    {...register(`lineItems.${index}.amount`)}
-                  /> */}
+                  <Amount
+                    control={control}
+                    index={index}
+                    setAmount={setAmount}
+                    amount={watch(`lineItems.${index}.amount`)}
+                  />
                 </div>
               ))}
             </div>
@@ -336,7 +361,7 @@ export default function Form() {
               <div className="col-start-2">
                 <div className="flex justify-between w-1/2 text-right">
                   <p>Subtotal</p>
-                  <p>$0.00</p>
+                  <p>{formatCurrency(getValues("subtotal"))}</p>
                 </div>
                 <div className="flex justify-between w-1/2 text-right">
                   <p>Total</p>
@@ -371,6 +396,7 @@ export default function Form() {
           </div>
           <div>
             <h3>Tax</h3>
+            {/* <TextInput {...register("")} /> */}
           </div>
         </aside>
       </section>
@@ -381,20 +407,29 @@ export default function Form() {
 function Amount({
   control,
   index,
+  setAmount,
+  amount,
 }: {
   control: Control<InvoiceFormData, any>;
   index: number;
+  amount: number;
+  setAmount(index: number, amount: number): void;
 }) {
-  const quantity = useWatch({ control, name: `lineItems.${index}.quantity` });
-  const rate = useWatch({ control, name: `lineItems.${index}.rate` });
+  const quantity = useWatch({
+    control,
+    name: `lineItems.${index}.quantity`,
+    defaultValue: 1,
+  });
 
-  // TODO:
-  const calculateAmount = useMemo(() => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(quantity * parseFloat(rate));
-  }, [quantity, rate]);
+  const rate = useWatch({
+    control,
+    name: `lineItems.${index}.rate`,
+    defaultValue: 0,
+  });
 
-  return <p className="">{calculateAmount}</p>;
+  useEffect(() => {
+    setAmount(index, quantity * rate);
+  }, [index, quantity, rate, setAmount]);
+
+  return <p className="w-2/12">{formatCurrency(amount)}</p>;
 }
