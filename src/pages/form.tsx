@@ -88,7 +88,7 @@ export default function Form() {
   return (
     <main className="container mx-auto">
       <section className="grid grid-cols-[3fr_1fr] pt-16 gap-8">
-        <article className="border-t-4 border-gray-600 bg-white pt-8">
+        <article className="pt-8 mb-20 bg-white border-t-4 border-b-4 border-gray-600">
           <form
             className="px-8"
             onSubmit={handleSubmit((data) => console.log(data))}
@@ -133,7 +133,7 @@ export default function Form() {
                   <div className="flex">
                     <FormControl id="from-state" label="State" name="">
                       <select
-                        className="select select-bordered select-sm w-1/2"
+                        className="w-1/2 select select-bordered select-md"
                         {...register("from.address.state")}
                       >
                         <option disabled>Choose state</option>
@@ -192,7 +192,7 @@ export default function Form() {
                   <div className="flex">
                     <FormControl id="to-state" label="State" name="">
                       <select
-                        className="select select-bordered select-sm w-1/2"
+                        className="w-1/2 select select-bordered select-md"
                         {...register("to.address.state")}
                       >
                         <option disabled>Choose state</option>
@@ -229,10 +229,10 @@ export default function Form() {
 
                   <div className="form-control">
                     <label htmlFor="invoice-terms" className="label">
-                      <span className="label-text-alt capitalize">Terms</span>
+                      <span className="capitalize label-text-alt">Terms</span>
                     </label>
                     <select
-                      className="select select-bordered select-sm w-full max-w-xs"
+                      className="w-full max-w-xs select select-bordered select-md"
                       {...register("invoice.terms")}
                     >
                       <option disabled>Choose terms</option>
@@ -244,15 +244,15 @@ export default function Form() {
               </div>
             </div>
 
-            <div className="line-items-container my-4">
-              <div className="flex py-2 pl-8 border-t border-b border-gray-300 gap-4 ml-4">
-                <label className="w-6/12" htmlFor="description">
+            <div className="my-4 line-items-container">
+              <div className="flex gap-4 py-2 pl-8 border-t border-b border-gray">
+                <label className="w-6/12 pl-4" htmlFor="description">
                   Description
                 </label>
-                <label className="w-2/12" htmlFor="rate">
+                <label className="w-2/12 pl-2" htmlFor="rate">
                   Rate
                 </label>
-                <label className="w-2/12" htmlFor="quantity">
+                <label className="w-2/12 pl-2" htmlFor="quantity">
                   Qty
                 </label>
                 <label className="w-2/12" htmlFor="amount">
@@ -260,7 +260,10 @@ export default function Form() {
                 </label>
               </div>
               {fields.map((field, index) => (
-                <div key={field.id} className="flex pl-8 py-2 gap-4 relative">
+                <div
+                  key={field.id}
+                  className="relative flex gap-4 py-2 pl-8 border-b border-gray-300"
+                >
                   <div className="absolute left-0">
                     <button
                       className="btn btn-sm"
@@ -275,45 +278,71 @@ export default function Form() {
                   <div className="w-6/12 ml-4">
                     <input
                       id="description"
-                      className="input input-sm input-bordered w-full"
+                      className="w-full input input-sm input-bordered"
                       placeholder="Item description"
                       {...register(`lineItems.${index}.description`)}
                     />
                     <textarea
-                      className="mt-2 textarea textarea-bordered w-full h-24 resize-none px-3"
+                      className="w-full h-24 px-3 mt-2 resize-none textarea textarea-bordered"
                       placeholder="Additional details"
                     />
                   </div>
                   <input
-                    className="input input-sm input-bordered w-2/12"
+                    className="w-2/12 input input-sm input-bordered"
                     {...register(`lineItems.${index}.rate`)}
                   />
                   <input
-                    className="input input-sm input-bordered w-2/12"
+                    className="w-2/12 input input-sm input-bordered"
                     {...register(`lineItems.${index}.quantity`)}
                   />
                   <input
-                    className="w-2/12 input input-sm pl-0"
+                    className="w-2/12 pl-0 input input-sm"
                     {...register(`lineItems.${index}.amount`)}
                   />
                 </div>
               ))}
             </div>
-            <div>
-              <button className="btn" onClick={() => append(defaultLineItem)}>
-                Add more
+            <div className="pb-4 border-b border-gray-300">
+              <button
+                className="text-white bg-black btn btn-sm btn-square"
+                onClick={() => append(defaultLineItem)}
+              >
+                +
               </button>
             </div>
 
-            <div>
+            <div className="grid grid-cols-2 gap-8 pt-4">
+              <div />
+              <div>
+                <div className="flex justify-between w-1/2 text-right">
+                  <p>Subtotal</p>
+                  <p>$0.00</p>
+                </div>
+                <div className="flex justify-between w-1/2 text-right">
+                  <p>Total</p>
+                  <p>$0.00</p>
+                </div>
+                <div className="flex justify-between w-1/2">
+                  <p>Balance Due</p>
+                  <p>$0.00</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="py-8">
               <button type="submit" className="btn">
-                Submit
+                Generate PDF
               </button>
             </div>
           </form>
         </article>
         <aside>
-          <h1>Choose color</h1>
+          <div>
+            <h3>Color</h3>
+          </div>
+          <div>
+            <h3>Tax</h3>
+          </div>
         </aside>
       </section>
     </main>

@@ -14,7 +14,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>(
     const {
       id,
       label = "",
-      inputSize = "sm",
+      inputSize = "md",
       children,
       type = "text",
       classes = [],
@@ -22,9 +22,9 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>(
     } = props;
 
     return (
-      <div className="form-control w-full">
+      <div className="w-full form-control">
         <label className="label" htmlFor={id}>
-          <span className="label-text-alt capitalize">{label}</span>
+          <span className="capitalize label-text-alt">{label}</span>
         </label>
         {children ? (
           children
@@ -32,9 +32,9 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>(
           <input
             id={id}
             type={type}
-            className={`input input-bordered input-${inputSize} ${classes?.join(
+            className={`w-full input input-bordered input-${inputSize} ${classes?.join(
               " "
-            )} w-full`}
+            )}`}
             ref={ref}
             {...rest}
           />
