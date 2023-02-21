@@ -1,4 +1,4 @@
-export function isKey<T extends {}>(
+export function isKeyOf<T extends {}>(
   object: T,
   key: PropertyKey
 ): key is keyof T {

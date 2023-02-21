@@ -1,4 +1,11 @@
-import { useFieldArray, useForm } from "react-hook-form";
+import {
+  type Control,
+  useFieldArray,
+  useForm,
+  useWatch,
+} from "react-hook-form";
+import Money, { type Dinero } from "dinero.js";
+
 import {
   FormControl,
   FileInput,
@@ -6,10 +13,12 @@ import {
   TextInput,
   Textarea,
 } from "@/components/Inputs";
-
 import { Address, GeneralDetails } from "@/components/GeneralDetails";
-import { isKey } from "@/utils/isKey";
+import { isKeyOf } from "@/utils/isKey";
 import type { Nullable } from "@/utils/types";
+import { useEffect, useMemo } from "react";
+import { states } from "@/utils/states";
+import { SelectOption } from "@/components/Inputs/SelectInput";
 
 type InvoiceDetails = {
   number: string;
@@ -31,9 +40,9 @@ type GeneralDetails = {
 type LineItem = {
   description: string;
   details: string;
-  rate: string;
+  rate: number;
   quantity: number;
-  amount: string;
+  amount: Dinero;
 };
 
 type InvoiceFormData = {
@@ -61,29 +70,31 @@ const defaultGeneralDetails: GeneralDetails = {
 const defaultLineItem = {
   description: "",
   details: "",
-  rate: "",
-  quantity: 0,
-  amount: "",
+  rate: Money({ amount: 0, precision: 2 }).toUnit(),
+  quantity: 1,
+  amount: Money({ amount: 0, precision: 2 }),
 };
 
+//rate .toFormat("0,0.00")
+//amount .toFormat("$0,0.00")
+
 export default function Form() {
-  const { register, control, handleSubmit } = useForm<InvoiceFormData>({
-    defaultValues: {
-      title: "Invoice",
-      logo: null,
-      from: defaultGeneralDetails,
-      to: defaultGeneralDetails,
-      invoice: {
-        number: "INV0001",
-        date: null,
-        terms: "on_receipt",
+  const { register, control, setValue, handleSubmit } =
+    useForm<InvoiceFormData>({
+      defaultValues: {
+        title: "Invoice",
+        logo: null,
+        from: defaultGeneralDetails,
+        to: defaultGeneralDetails,
+        invoice: {
+          number: "INV0001",
+          date: null,
+          terms: "on_receipt",
+        },
+        lineItems: [defaultLineItem],
+        notes: "",
       },
-      lineItems: [
-        { description: "", details: "", rate: "", quantity: 0, amount: "" },
-      ],
-      notes: "",
-    },
-  });
+    });
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -106,7 +117,7 @@ export default function Form() {
                 <GeneralDetails title="From">
                   {Object.keys(defaultGeneralDetails).map((detail) => {
                     if (
-                      isKey(defaultGeneralDetails, detail) &&
+                      isKeyOf(defaultGeneralDetails, detail) &&
                       detail !== "address"
                     ) {
                       return (
@@ -135,12 +146,8 @@ export default function Form() {
                   <div className="flex">
                     <FormControl id="from-state" label="State">
                       <SelectInput
-                        selectOptions={[
-                          { label: "State", value: "", disabled: true },
-                          { label: "NJ", value: "NJ" },
-                          { label: "NY", value: "NY" },
-                          { label: "MA", value: "MA" },
-                        ]}
+                        selectOptions={states}
+                        defaultLabel="Choose state"
                         {...register("from.address.state")}
                       />
                     </FormControl>
@@ -161,7 +168,7 @@ export default function Form() {
                 <GeneralDetails title="To">
                   {Object.keys(defaultGeneralDetails).map((detail) => {
                     if (
-                      isKey(defaultGeneralDetails, detail) &&
+                      isKeyOf(defaultGeneralDetails, detail) &&
                       detail !== "address"
                     ) {
                       return (
@@ -190,12 +197,8 @@ export default function Form() {
                   <div className="flex">
                     <FormControl id="to-state" label="State">
                       <SelectInput
-                        selectOptions={[
-                          { label: "State", value: "", disabled: true },
-                          { label: "NJ", value: "NJ" },
-                          { label: "NY", value: "NY" },
-                          { label: "MA", value: "MA" },
-                        ]}
+                        defaultLabel="Choose state"
+                        selectOptions={states}
                         {...register("to.address.state")}
                       />
                     </FormControl>
@@ -226,8 +229,8 @@ export default function Form() {
                   </FormControl>
                   <FormControl id="invoice-terms" label="Terms">
                     <SelectInput
+                      defaultLabel="Choose terms"
                       selectOptions={[
-                        { value: "", label: "Choose terms", disabled: true },
                         { value: "on_receipt", label: "On receipt" },
                         { value: "30_days", label: "30 days" },
                         { value: "60_days", label: "60 days" },
@@ -261,6 +264,7 @@ export default function Form() {
                 >
                   <div className="absolute left-0">
                     <button
+                      type="button"
                       className="btn btn-sm"
                       onClick={() => {
                         if (fields.length === 1) return;
@@ -287,6 +291,7 @@ export default function Form() {
                     id={`rate-${index}`}
                     inputSize="sm"
                     width="w-2/12"
+                    type="number"
                     {...register(`lineItems.${index}.rate`)}
                   />
                   <TextInput
@@ -295,17 +300,19 @@ export default function Form() {
                     width="w-2/12"
                     {...register(`lineItems.${index}.quantity`)}
                   />
-                  <TextInput
+                  <Amount control={control} index={index} />
+                  {/* <TextInput
                     id={`amount-${index}`}
                     inputSize="sm"
                     width="w-2/12"
                     {...register(`lineItems.${index}.amount`)}
-                  />
+                  /> */}
                 </div>
               ))}
             </div>
             <div className="pb-4 border-b border-gray-300">
               <button
+                type="button"
                 className="text-white bg-black btn btn-sm btn-square"
                 onClick={() => append(defaultLineItem)}
               >
@@ -357,4 +364,29 @@ export default function Form() {
       </section>
     </main>
   );
+}
+
+function Amount({
+  control,
+  index,
+}: {
+  control: Control<InvoiceFormData, any>;
+  index: number;
+}) {
+  const lineItems = useWatch({ control, name: "lineItems" });
+
+  // TODO:ERROR
+  const calculateAmount = useMemo(() => {
+    const lineItem = lineItems[index];
+    const quantity = lineItem.quantity;
+    const rate =
+      typeof lineItem.rate === "string"
+        ? parseInt(lineItem.rate, 10)
+        : lineItem.rate;
+    const parsedRate = Money({ amount: rate, precision: 2 });
+
+    return parsedRate.multiply(quantity).toFormat("$0,0.00");
+  }, [index, lineItems]);
+
+  return <p>{calculateAmount}</p>;
 }
