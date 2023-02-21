@@ -10,6 +10,7 @@ type SelectInputProps = ComponentPropsWithRef<"select"> & {
   defaultLabel?: string;
 };
 
+// TODO: default selected
 // eslint-disable-next-line react/display-name
 export const SelectInput = forwardRef<HTMLSelectElement, SelectInputProps>(
   ({ defaultLabel, selectOptions = [], ...rest }, ref) => {
@@ -20,7 +21,7 @@ export const SelectInput = forwardRef<HTMLSelectElement, SelectInputProps>(
         {...rest}
       >
         {defaultLabel ? (
-          <option key="default-select" disabled>
+          <option key="default-select" value="default" disabled>
             {defaultLabel}
           </option>
         ) : null}

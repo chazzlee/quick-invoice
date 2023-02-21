@@ -1,3 +1,4 @@
+import Image from "next/image";
 import {
   type Control,
   useFieldArray,
@@ -40,7 +41,7 @@ type GeneralDetails = {
 type LineItem = {
   description: string;
   details: string;
-  rate: number;
+  rate: string;
   quantity: number;
   amount: Dinero;
 };
@@ -67,10 +68,10 @@ const defaultGeneralDetails: GeneralDetails = {
   },
 };
 
-const defaultLineItem = {
+const defaultLineItem: LineItem = {
   description: "",
   details: "",
-  rate: Money({ amount: 0, precision: 2 }).toUnit(),
+  rate: Money({ amount: 0, precision: 2 }).toFormat("0,0.00"),
   quantity: 1,
   amount: Money({ amount: 0, precision: 2 }),
 };
@@ -79,7 +80,7 @@ const defaultLineItem = {
 //amount .toFormat("$0,0.00")
 
 export default function Form() {
-  const { register, control, setValue, handleSubmit } =
+  const { register, control, watch, setValue, handleSubmit } =
     useForm<InvoiceFormData>({
       defaultValues: {
         title: "Invoice",
@@ -95,6 +96,8 @@ export default function Form() {
         notes: "",
       },
     });
+
+  const companyLogo = watch("logo");
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -161,10 +164,20 @@ export default function Form() {
                 </Address>
               </div>
 
-              <div className="to">
+              <div className="relative to">
                 <FormControl id="logo" label="Company logo">
                   <FileInput {...register("logo")} />
                 </FormControl>
+                <div className="absolute w-1/2 mt-6 border h-28 logo-preview">
+                  {companyLogo?.[0] && (
+                    <Image
+                      src={URL.createObjectURL(companyLogo?.[0])}
+                      alt="Company logo"
+                      className="object-contain w-full h-full"
+                      onLoad={(e) => URL.revokeObjectURL(e.currentTarget.src)}
+                    />
+                  )}
+                </div>
                 <GeneralDetails title="To">
                   {Object.keys(defaultGeneralDetails).map((detail) => {
                     if (
@@ -291,7 +304,6 @@ export default function Form() {
                     id={`rate-${index}`}
                     inputSize="sm"
                     width="w-2/12"
-                    type="number"
                     {...register(`lineItems.${index}.rate`)}
                   />
                   <TextInput
@@ -373,20 +385,16 @@ function Amount({
   control: Control<InvoiceFormData, any>;
   index: number;
 }) {
-  const lineItems = useWatch({ control, name: "lineItems" });
+  const quantity = useWatch({ control, name: `lineItems.${index}.quantity` });
+  const rate = useWatch({ control, name: `lineItems.${index}.rate` });
 
-  // TODO:ERROR
+  // TODO:
   const calculateAmount = useMemo(() => {
-    const lineItem = lineItems[index];
-    const quantity = lineItem.quantity;
-    const rate =
-      typeof lineItem.rate === "string"
-        ? parseInt(lineItem.rate, 10)
-        : lineItem.rate;
-    const parsedRate = Money({ amount: rate, precision: 2 });
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(quantity * parseFloat(rate));
+  }, [quantity, rate]);
 
-    return parsedRate.multiply(quantity).toFormat("$0,0.00");
-  }, [index, lineItems]);
-
-  return <p>{calculateAmount}</p>;
+  return <p className="">{calculateAmount}</p>;
 }
