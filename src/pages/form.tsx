@@ -96,27 +96,34 @@ const defaultLineItem: LineItem = {
 //amount .toFormat("$0,0.00")
 
 export default function Form() {
-  const { register, control, watch, getValues, setValue, handleSubmit } =
-    useForm<InvoiceFormData>({
-      defaultValues: {
-        title: "Invoice",
-        logo: null,
-        from: structuredClone(defaultGeneralDetails),
-        to: structuredClone(defaultGeneralDetails),
-        invoice: {
-          number: "INV0001",
-          date: null,
-          terms: "on_receipt",
-        },
-        lineItems: [{ ...defaultLineItem }],
-        notes: "",
-        subtotal: 0,
-        total: 0,
-        totalTax: 0,
-        tax: { type: "no_tax", rate: 0 },
-        balanceDue: 0,
+  const {
+    register,
+    control,
+    watch,
+    getValues,
+    setValue,
+    handleSubmit,
+    resetField,
+  } = useForm<InvoiceFormData>({
+    defaultValues: {
+      title: "Invoice",
+      logo: null,
+      from: structuredClone(defaultGeneralDetails),
+      to: structuredClone(defaultGeneralDetails),
+      invoice: {
+        number: "INV0001",
+        date: null,
+        terms: "on_receipt",
       },
-    });
+      lineItems: [{ ...defaultLineItem }],
+      notes: "",
+      subtotal: 0,
+      total: 0,
+      totalTax: 0,
+      tax: { type: "no_tax", rate: 0 },
+      balanceDue: 0,
+    },
+  });
 
   const companyLogo = watch("logo");
 
@@ -125,35 +132,47 @@ export default function Form() {
     name: "lineItems",
   });
 
-  const SAMPLE_PAID = 0;
-
   const taxRate = watch("tax.rate");
   const taxType = watch("tax.type");
   const isTaxable = taxType !== "no_tax";
 
-  // TODO:FIXME:
-  const updateTotals = useCallback(() => {
-    const lineItems = watch("lineItems");
+  const lineItems = watch("lineItems");
+
+  const updateSubtotal = useCallback(() => {
     const subtotal = lineItems.reduce((acc, prev) => acc + prev.amount, 0);
-    const taxable = lineItems
-      .filter((lineItem) => lineItem.taxable)
-      .reduce((acc, prev) => acc + prev.amount, 0);
-    const totalTax = taxable * (taxRate / 100); //TODO: only tax taxables
-    const total = totalTax + subtotal;
-    const balanceDue = total - SAMPLE_PAID; //TODO: need discounts, previously paid balance etc
-
     setValue("subtotal", subtotal);
-    setValue("totalTax", totalTax);
-    setValue("total", total);
-    setValue("balanceDue", balanceDue);
-  }, [watch, setValue, taxRate]);
+  }, [setValue, lineItems]);
 
-  const setAmount = useCallback(
+  const updateTotalTax = useCallback(() => {
+    // TODO: different "tax types"
+    const totalTax = lineItems
+      .filter((lineItem) => lineItem.taxable)
+      .reduce((acc, prev) => acc + prev.amount * (taxRate / 100), 0);
+    setValue("totalTax", totalTax);
+  }, [setValue, lineItems, taxRate]);
+
+  const updateTotal = useCallback(() => {
+    const subtotal = getValues("subtotal");
+    const totalTax = getValues("totalTax");
+    const total = subtotal + totalTax;
+    setValue("total", total);
+  }, [getValues, setValue]);
+
+  const updateBalanceDue = useCallback(() => {
+    const total = getValues("total");
+    // TODO; discounts etc
+    setValue("balanceDue", total);
+  }, [getValues, setValue]);
+
+  const updateAmount = useCallback(
     (index: number, amount: number) => {
       setValue(`lineItems.${index}.amount`, amount);
-      updateTotals();
+      updateSubtotal();
+      updateTotalTax();
+      updateTotal();
+      updateBalanceDue();
     },
-    [setValue, updateTotals]
+    [setValue, updateSubtotal, updateTotalTax, updateTotal, updateBalanceDue]
   );
 
   return (
@@ -385,7 +404,7 @@ export default function Form() {
                   <Amount
                     control={control}
                     index={index}
-                    setAmount={setAmount}
+                    updateAmount={updateAmount}
                     amount={watch(`lineItems.${index}.amount`)}
                   />
 
@@ -394,7 +413,14 @@ export default function Form() {
                       <input
                         type="checkbox"
                         className="checkbox"
-                        {...register(`lineItems.${index}.taxable`)}
+                        {...register(`lineItems.${index}.taxable`, {
+                          onChange() {
+                            updateSubtotal();
+                            updateTotalTax();
+                            updateTotal();
+                            updateBalanceDue();
+                          },
+                        })}
                         defaultChecked={isTaxable}
                       />
                     </div>
@@ -479,7 +505,9 @@ export default function Form() {
                           taxable: false,
                         }))
                       );
+                      resetField("tax.rate");
                     }
+                    updateTotalTax();
                   },
                 })}
               />
@@ -488,6 +516,7 @@ export default function Form() {
               <FormControl id="tax-rate" label="Rate">
                 <TextInput
                   type="number"
+                  min={0}
                   width="w-1/2"
                   {...register("tax.rate", { valueAsNumber: true })}
                 />
@@ -504,13 +533,13 @@ export default function Form() {
 function Amount({
   control,
   index,
-  setAmount,
+  updateAmount,
   amount,
 }: {
   control: Control<InvoiceFormData, any>;
   index: number;
   amount: number;
-  setAmount(index: number, amount: number): void;
+  updateAmount(index: number, amount: number): void;
 }) {
   const quantity = useWatch({
     control,
@@ -525,8 +554,8 @@ function Amount({
   });
 
   useEffect(() => {
-    setAmount(index, quantity * rate);
-  }, [index, quantity, rate, setAmount]);
+    updateAmount(index, quantity * rate);
+  }, [index, quantity, rate, updateAmount]);
 
   //TODO: styles
   return <p className="w-2/12">{formatCurrency(amount)}</p>;
