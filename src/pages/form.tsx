@@ -6,7 +6,6 @@ import {
   useWatch,
 } from "react-hook-form";
 // import Money, { type Dinero } from "dinero.js";
-
 import {
   FormControl,
   FileInput,
@@ -17,13 +16,7 @@ import {
 import { Address, GeneralDetails } from "@/components/GeneralDetails";
 import { isKeyOf } from "@/utils/isKey";
 import type { Nullable } from "@/utils/types";
-import {
-  ChangeEvent,
-  ComponentPropsWithRef,
-  forwardRef,
-  useCallback,
-  useEffect,
-} from "react";
+import { ChangeEvent, useCallback, useEffect } from "react";
 import { states } from "@/utils/states";
 import { formatCurrency } from "@/utils/formatCurrency";
 
@@ -92,9 +85,6 @@ const defaultLineItem: LineItem = {
   taxable: false,
 };
 
-//rate .toFormat("0,0.00")
-//amount .toFormat("$0,0.00")
-
 export default function Form() {
   const {
     register,
@@ -127,16 +117,19 @@ export default function Form() {
 
   const companyLogo = watch("logo");
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control,
     name: "lineItems",
   });
 
+  const lineItems = watch("lineItems");
   const taxRate = watch("tax.rate");
   const taxType = watch("tax.type");
+  const subtotal = watch("subtotal");
+  const totalTax = watch("totalTax");
+  const total = watch("total");
+  const balanceDue = watch("balanceDue");
   const isTaxable = taxType !== "no_tax";
-
-  const lineItems = watch("lineItems");
 
   const updateSubtotal = useCallback(() => {
     const subtotal = lineItems.reduce((acc, prev) => acc + prev.amount, 0);
@@ -152,11 +145,9 @@ export default function Form() {
   }, [setValue, lineItems, taxRate]);
 
   const updateTotal = useCallback(() => {
-    const subtotal = getValues("subtotal");
-    const totalTax = getValues("totalTax");
     const total = subtotal + totalTax;
     setValue("total", total);
-  }, [getValues, setValue]);
+  }, [setValue, subtotal, totalTax]);
 
   const updateBalanceDue = useCallback(() => {
     const total = getValues("total");
@@ -174,6 +165,21 @@ export default function Form() {
     },
     [setValue, updateSubtotal, updateTotalTax, updateTotal, updateBalanceDue]
   );
+
+  const onSelectTaxChange = (taxType: InvoiceFormData["tax"]["type"]) => {
+    setValue("tax.type", taxType);
+    if (taxType === "no_tax") {
+      setValue(
+        "lineItems",
+        getValues("lineItems").map((lineItem) => ({
+          ...lineItem,
+          taxable: false,
+        }))
+      );
+      resetField("tax.rate");
+    }
+    updateTotalTax();
+  };
 
   return (
     <main className="container mx-auto">
@@ -302,7 +308,7 @@ export default function Form() {
             <div className="invoice-details">
               <div className="divider" />
               <div className="grid grid-cols-2 gap-8">
-                <div>
+                <div className="invoice-details-container">
                   <FormControl id="invoice-number" label="Number">
                     <TextInput width="w-1/2" {...register("invoice.number")} />
                   </FormControl>
@@ -329,17 +335,24 @@ export default function Form() {
             </div>
 
             <div className="my-4 line-items-container">
-              <div className="flex gap-4 py-2 pl-8 border-t border-b border-gray-400">
+              <div className="flex gap-4 py-2 border-t border-b border-gray-400">
+                <button
+                  type="button"
+                  className="btn btn-square btn-sm"
+                  onClick={() => replace([{ ...defaultLineItem }])}
+                >
+                  C
+                </button>
                 <label
-                  className={`${isTaxable ? "w-5/12" : "w-6/12"} pl-4`}
+                  className={`${isTaxable ? "w-5/12" : "w-6/12"}`}
                   htmlFor="description"
                 >
                   Description
                 </label>
-                <label className="w-2/12 pl-2" htmlFor="rate">
+                <label className="w-2/12" htmlFor="rate">
                   Rate
                 </label>
-                <label className="w-2/12 pl-2" htmlFor="quantity">
+                <label className="w-2/12" htmlFor="quantity">
                   Qty
                 </label>
                 <label className="w-2/12" htmlFor="amount">
@@ -415,10 +428,7 @@ export default function Form() {
                         className="checkbox"
                         {...register(`lineItems.${index}.taxable`, {
                           onChange() {
-                            updateSubtotal();
                             updateTotalTax();
-                            updateTotal();
-                            updateBalanceDue();
                           },
                         })}
                         defaultChecked={isTaxable}
@@ -442,21 +452,21 @@ export default function Form() {
               <div className="col-start-2">
                 <div className="flex justify-between w-1/2">
                   <p>Subtotal</p>
-                  <p>{formatCurrency(getValues("subtotal"))}</p>
+                  <p>{formatCurrency(subtotal)}</p>
                 </div>
                 {watch("tax.type") !== "no_tax" ? (
                   <div className="flex justify-between w-1/2">
                     <p>Tax ({taxRate}%)</p>
-                    <p>{formatCurrency(getValues("totalTax"))}</p>
+                    <p>{formatCurrency(totalTax)}</p>
                   </div>
                 ) : null}
                 <div className="flex justify-between w-1/2">
                   <p>Total</p>
-                  <p>{formatCurrency(getValues("total"))}</p>
+                  <p>{formatCurrency(total)}</p>
                 </div>
                 <div className="flex justify-between w-1/2">
                   <p className="font-semibold">Balance Due</p>
-                  <p>{formatCurrency(getValues("balanceDue"))}</p>
+                  <p>{formatCurrency(balanceDue)}</p>
                 </div>
               </div>
             </div>
@@ -480,6 +490,7 @@ export default function Form() {
         <aside>
           <div>
             <h3>Color</h3>
+            <p>choose your color</p>
           </div>
 
           <div className="tax-container">
@@ -494,20 +505,9 @@ export default function Form() {
                 ]}
                 {...register("tax.type", {
                   onChange(event: ChangeEvent<HTMLSelectElement>) {
-                    const taxType = event.target
-                      .value as InvoiceFormData["tax"]["type"];
-                    setValue("tax.type", taxType);
-                    if (taxType === "no_tax") {
-                      setValue(
-                        "lineItems",
-                        getValues("lineItems").map((lineItem) => ({
-                          ...lineItem,
-                          taxable: false,
-                        }))
-                      );
-                      resetField("tax.rate");
-                    }
-                    updateTotalTax();
+                    onSelectTaxChange(
+                      event.target.value as InvoiceFormData["tax"]["type"]
+                    );
                   },
                 })}
               />
@@ -558,5 +558,5 @@ function Amount({
   }, [index, quantity, rate, updateAmount]);
 
   //TODO: styles
-  return <p className="w-2/12">{formatCurrency(amount)}</p>;
+  return <p className="w-2/12 mt-3">{formatCurrency(amount)}</p>;
 }
