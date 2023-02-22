@@ -147,8 +147,6 @@ export default function Form() {
   const balanceDue = watch("balanceDue");
   const isTaxable = taxType !== "no_tax";
 
-  console.log({ totalTax });
-
   const termsType = watch("invoice.terms.type");
   const hasDueDate = termsType !== "on_receipt";
 
