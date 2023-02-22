@@ -23,7 +23,10 @@ import { formatCurrency } from "@/utils/formatCurrency";
 type InvoiceDetails = {
   number: string;
   date: Nullable<Date>;
-  terms: string;
+  terms: {
+    type: "on_receipt" | "30_days" | "60_days";
+    dueDate: Nullable<Date>;
+  };
 };
 
 type GeneralDetails = {
@@ -57,11 +60,16 @@ type InvoiceFormData = {
   subtotal: number;
   totalTax: number;
   total: number;
+  totalDiscount: number;
   tax: {
     type: "on_total" | "no_tax" | "deducted" | "per_item";
     rate: number;
   };
   balanceDue: number;
+  discount: {
+    type: "no_discount" | "percent" | "flat_amount";
+    value: number;
+  };
 };
 
 const defaultGeneralDetails: GeneralDetails = {
@@ -103,14 +111,22 @@ export default function Form() {
       invoice: {
         number: "INV0001",
         date: null,
-        terms: "on_receipt",
+        terms: {
+          type: "on_receipt",
+          dueDate: null,
+        },
+      },
+      tax: { type: "no_tax", rate: 0 },
+      discount: {
+        type: "no_discount",
+        value: 0,
       },
       lineItems: [{ ...defaultLineItem }],
       notes: "",
       subtotal: 0,
       total: 0,
       totalTax: 0,
-      tax: { type: "no_tax", rate: 0 },
+      totalDiscount: 0,
       balanceDue: 0,
     },
   });
@@ -131,6 +147,17 @@ export default function Form() {
   const balanceDue = watch("balanceDue");
   const isTaxable = taxType !== "no_tax";
 
+  const termsType = watch("invoice.terms.type");
+  const hasDueDate = termsType !== "on_receipt";
+
+  const discountType = watch("discount.type");
+  const discountValue = watch("discount.value");
+  const hasDiscount = discountType !== "no_discount";
+  const isFlatDiscount = discountType === "flat_amount";
+  const isPercentageDiscount = discountType === "percent";
+  const totalDiscount = watch("totalDiscount");
+  // TODO: update total discount, clear discount if discount === 'no_discount"
+
   const updateSubtotal = useCallback(() => {
     const subtotal = lineItems.reduce((acc, prev) => acc + prev.amount, 0);
     setValue("subtotal", subtotal);
@@ -145,25 +172,54 @@ export default function Form() {
   }, [setValue, lineItems, taxRate]);
 
   const updateTotal = useCallback(() => {
-    const total = subtotal + totalTax;
+    const total = subtotal + totalDiscount + totalTax;
     setValue("total", total);
-  }, [setValue, subtotal, totalTax]);
+  }, [setValue, subtotal, totalTax, totalDiscount]);
 
   const updateBalanceDue = useCallback(() => {
-    const total = getValues("total");
     // TODO; discounts etc
     setValue("balanceDue", total);
-  }, [getValues, setValue]);
+  }, [total, setValue]);
+
+  const updateTotalDiscount = useCallback(() => {
+    switch (discountType) {
+      case "flat_amount": {
+        const totalDiscount = discountValue * -1;
+        setValue("totalDiscount", totalDiscount);
+        break;
+      }
+      case "percent": {
+        const discountAsPercentage = discountValue / 100;
+        const totalDiscount = subtotal * discountAsPercentage * -1;
+        setValue("totalDiscount", totalDiscount);
+        break;
+      }
+      case "no_discount": {
+        setValue("totalDiscount", 0);
+        break;
+      }
+      default:
+        throw new Error("Invalid discount type");
+    }
+  }, [discountType, discountValue, setValue, subtotal]);
 
   const updateAmount = useCallback(
     (index: number, amount: number) => {
       setValue(`lineItems.${index}.amount`, amount);
       updateSubtotal();
+      updateTotalDiscount();
       updateTotalTax();
       updateTotal();
       updateBalanceDue();
     },
-    [setValue, updateSubtotal, updateTotalTax, updateTotal, updateBalanceDue]
+    [
+      setValue,
+      updateSubtotal,
+      updateTotalDiscount,
+      updateTotalTax,
+      updateTotal,
+      updateBalanceDue,
+    ]
   );
 
   const onSelectTaxChange = (taxType: InvoiceFormData["tax"]["type"]) => {
@@ -327,15 +383,24 @@ export default function Form() {
                         { value: "30_days", label: "30 days" },
                         { value: "60_days", label: "60 days" },
                       ]}
-                      {...register("invoice.terms")}
+                      {...register("invoice.terms.type")}
                     />
                   </FormControl>
+                  {hasDueDate ? (
+                    <FormControl id="due-date" label="Due date">
+                      <TextInput
+                        type="date"
+                        width="w-1/2"
+                        {...register("invoice.terms.dueDate")}
+                      />
+                    </FormControl>
+                  ) : null}
                 </div>
               </div>
             </div>
 
             <div className="my-4 line-items-container">
-              <div className="flex gap-4 py-2 border-t border-b border-gray-400">
+              <div className="flex items-center gap-4 py-2 border-t border-b border-gray-400">
                 <button
                   type="button"
                   className="btn btn-square btn-sm"
@@ -374,8 +439,11 @@ export default function Form() {
                       type="button"
                       className="btn btn-sm"
                       onClick={() => {
-                        if (fields.length === 1) return;
-                        remove(index);
+                        if (fields.length === 1) {
+                          replace([{ ...defaultLineItem }]);
+                        } else {
+                          remove(index);
+                        }
                       }}
                     >
                       &times;
@@ -422,7 +490,7 @@ export default function Form() {
                   />
 
                   {isTaxable ? (
-                    <div className="w-1/12">
+                    <div className="w-1/12 mt-3">
                       <input
                         type="checkbox"
                         className="checkbox"
@@ -454,7 +522,15 @@ export default function Form() {
                   <p>Subtotal</p>
                   <p>{formatCurrency(subtotal)}</p>
                 </div>
-                {watch("tax.type") !== "no_tax" ? (
+                {hasDiscount ? (
+                  <div className="flex justify-between w-1/2">
+                    <p>
+                      Discount {isPercentageDiscount && `(${discountValue}%)`}
+                    </p>
+                    <p>{formatCurrency(totalDiscount)}</p>
+                  </div>
+                ) : null}
+                {isTaxable ? (
                   <div className="flex justify-between w-1/2">
                     <p>Tax ({taxRate}%)</p>
                     <p>{formatCurrency(totalTax)}</p>
@@ -466,7 +542,7 @@ export default function Form() {
                 </div>
                 <div className="flex justify-between w-1/2">
                   <p className="font-semibold">Balance Due</p>
-                  <p>{formatCurrency(balanceDue)}</p>
+                  <p className="font-semibold">{formatCurrency(balanceDue)}</p>
                 </div>
               </div>
             </div>
@@ -487,13 +563,15 @@ export default function Form() {
             </div>
           </form>
         </article>
+
+        {/* TODO: ASIDE */}
         <aside>
-          <div>
+          <div className="color-container">
             <h3>Color</h3>
             <p>choose your color</p>
           </div>
 
-          <div className="tax-container">
+          <div className="pt-8 tax-container">
             <h3 className="font-semibold">Tax</h3>
             <FormControl id="tax-type" label="Type">
               <SelectInput
@@ -522,6 +600,43 @@ export default function Form() {
                 />
               </FormControl>
             ) : null}
+          </div>
+
+          <div className="pt-8 discount-container">
+            <h3 className="font-semibold">Discount</h3>
+            <FormControl id="discount" label="Type">
+              <SelectInput
+                selectOptions={[
+                  { label: "None", value: "no_discount" },
+                  { label: "Percent", value: "percent" },
+                  { label: "Flat amount", value: "flat_amount" },
+                ]}
+                {...register("discount.type")}
+              />
+            </FormControl>
+            {isPercentageDiscount && (
+              <FormControl id="percent" label="Percent">
+                <TextInput
+                  width="w-1/2"
+                  type="number"
+                  {...register("discount.value")}
+                />
+              </FormControl>
+            )}
+            {isFlatDiscount && (
+              <FormControl id="flat-amount" label="Amount">
+                <TextInput
+                  width="w-1/2"
+                  type="number"
+                  {...register("discount.value", {
+                    valueAsNumber: true,
+                    onChange() {
+                      updateTotalDiscount();
+                    },
+                  })}
+                />
+              </FormControl>
+            )}
           </div>
         </aside>
       </section>
