@@ -147,6 +147,8 @@ export default function Form() {
   const balanceDue = watch("balanceDue");
   const isTaxable = taxType !== "no_tax";
 
+  console.log({ totalTax });
+
   const termsType = watch("invoice.terms.type");
   const hasDueDate = termsType !== "on_receipt";
 
@@ -164,12 +166,32 @@ export default function Form() {
   }, [setValue, lineItems]);
 
   const updateTotalTax = useCallback(() => {
-    // TODO: different "tax types"
-    const totalTax = lineItems
-      .filter((lineItem) => lineItem.taxable)
-      .reduce((acc, prev) => acc + prev.amount * (taxRate / 100), 0);
-    setValue("totalTax", totalTax);
-  }, [setValue, lineItems, taxRate]);
+    const taxableItems = lineItems.filter((lineItem) => lineItem.taxable);
+    const totalTax = taxableItems.reduce(
+      (acc, prev) => acc + prev.amount * (taxRate / 100),
+      0
+    );
+    switch (taxType) {
+      case "on_total": {
+        setValue("totalTax", totalTax);
+        break;
+      }
+      case "deducted": {
+        setValue("totalTax", totalTax * -1);
+        break;
+      }
+      case "per_item": {
+        throw new Error("Not yet implemented");
+        break;
+      }
+      case "no_tax": {
+        setValue("totalTax", 0);
+        break;
+      }
+      default:
+        throw new Error("Invalid tax type");
+    }
+  }, [lineItems, taxType, setValue, taxRate]);
 
   const updateTotal = useCallback(() => {
     const total = subtotal + totalDiscount + totalTax;
