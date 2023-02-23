@@ -1,10 +1,11 @@
 import { FormControl, SelectInput, TextInput } from "@/components/Inputs";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
+import { useTerms } from "../../hooks/useTerms";
+import { selectTerms } from "../../selectOptions";
 
 export function InvoiceDetails() {
-  const { register, watch } = useInvoiceFormContext();
-  const termsType = watch("invoice.terms.type");
-  const hasDueDate = termsType !== "on_receipt";
+  const { register } = useInvoiceFormContext();
+  const { hasDueDate } = useTerms();
 
   return (
     <div className="invoice-details">
@@ -17,11 +18,7 @@ export function InvoiceDetails() {
       <FormControl id="invoice-terms" label="Terms">
         <SelectInput
           defaultLabel="Choose terms"
-          selectOptions={[
-            { value: "on_receipt", label: "On receipt" },
-            { value: "30_days", label: "30 days" },
-            { value: "60_days", label: "60 days" },
-          ]}
+          selectOptions={selectTerms}
           {...register("invoice.terms.type")}
         />
       </FormControl>

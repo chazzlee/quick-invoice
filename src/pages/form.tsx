@@ -17,7 +17,6 @@ import { Address, GeneralDetails } from "@/components/GeneralDetails";
 import { isKeyOf } from "@/utils/isKey";
 import type { Nullable } from "@/utils/types";
 import { ChangeEvent, useCallback, useEffect } from "react";
-import { states } from "@/utils/states";
 import { formatCurrency } from "@/utils/formatCurrency";
 
 type InvoiceDetails = {
@@ -302,7 +301,7 @@ export default function Form() {
                   <div className="flex">
                     <FormControl id="from-state" label="State">
                       <SelectInput
-                        selectOptions={states}
+                        selectOptions={[]}
                         defaultLabel="Choose state"
                         {...register("from.address.state")}
                       />
@@ -366,7 +365,7 @@ export default function Form() {
                     <FormControl id="to-state" label="State">
                       <SelectInput
                         defaultLabel="Choose state"
-                        selectOptions={states}
+                        selectOptions={[]}
                         {...register("to.address.state")}
                       />
                     </FormControl>

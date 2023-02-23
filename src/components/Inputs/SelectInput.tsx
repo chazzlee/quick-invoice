@@ -1,9 +1,5 @@
+import type { SelectOption } from "@/features/invoices/selectOptions";
 import { type ComponentPropsWithRef, forwardRef } from "react";
-
-export type SelectOption = {
-  label: string;
-  value: string;
-};
 
 type SelectInputProps = ComponentPropsWithRef<"select"> & {
   selectOptions: SelectOption[];

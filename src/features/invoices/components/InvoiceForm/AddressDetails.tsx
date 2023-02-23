@@ -1,5 +1,6 @@
 import { FormControl, SelectInput, TextInput } from "@/components/Inputs";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
+import { selectStates } from "../../selectOptions";
 
 type AddressDetailsProps = { id: "from" | "to" };
 
@@ -18,7 +19,7 @@ export function AddressDetails({ id }: AddressDetailsProps) {
       <div className="flex">
         <FormControl id={`${id}-state`} label="State">
           <SelectInput
-            selectOptions={[]}
+            selectOptions={selectStates}
             defaultLabel="Choose state"
             {...register(`${id}.address.state`)}
           />

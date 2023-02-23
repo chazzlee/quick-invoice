@@ -1,41 +1,12 @@
-import { useCallback } from "react";
-import { useFieldArray, useWatch } from "react-hook-form";
-import type { InvoiceFormData } from "@/features/invoices/types";
-import { defaultLineItem } from "@/features/invoices/defaults";
+import { useTax } from "@/features/invoices/hooks/useTax";
+import { useLineItems } from "@/features/invoices/hooks/useLineItems";
 import { LineItemsHeader } from "./LineItemsHeader";
 import { LineItem } from "./LineItem";
 import { AddMoreButton } from "./AddMoreButton";
 
 export function LineItems() {
-  const taxType = useWatch<InvoiceFormData, "tax.type">({
-    name: "tax.type",
-    defaultValue: "no_tax",
-  });
-  const isTaxable = taxType !== "no_tax";
-
-  const { fields, append, remove, replace } = useFieldArray<InvoiceFormData>({
-    name: "lineItems",
-  });
-
-  const onClear = useCallback(
-    () => replace([{ ...defaultLineItem }]),
-    [replace]
-  );
-
-  const onRemove = useCallback(
-    (index: number) => {
-      if (fields.length === 1) {
-        replace([{ ...defaultLineItem }]);
-      } else {
-        remove(index);
-      }
-    },
-    [fields.length, remove, replace]
-  );
-
-  const onAddMore = useCallback(() => {
-    append(defaultLineItem);
-  }, [append]);
+  const { isTaxable } = useTax();
+  const { fields, onClear, onRemove, onAddMore } = useLineItems();
 
   return (
     <div className="my-4 line-items-container">

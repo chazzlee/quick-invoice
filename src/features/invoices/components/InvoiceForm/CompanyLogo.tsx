@@ -1,10 +1,11 @@
 import Image from "next/image";
 import { FileInput, FormControl } from "@/components/Inputs";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
+import { useLogo } from "../../hooks/useLogo";
 
 export function CompanyLogo() {
-  const { register, watch } = useInvoiceFormContext();
-  const companyLogo = watch("logo");
+  const { register } = useInvoiceFormContext();
+  const companyLogo = useLogo();
 
   return (
     <div className="image-preview">
@@ -12,9 +13,9 @@ export function CompanyLogo() {
         <FileInput {...register("logo")} />
       </FormControl>
       <div className="w-1/2 mt-8 bg-white border h-28 logo-preview">
-        {companyLogo?.[0] ? (
+        {companyLogo ? (
           <Image
-            src={URL.createObjectURL(companyLogo?.[0])}
+            src={URL.createObjectURL(companyLogo)}
             alt="Company logo"
             className="object-contain w-full h-full"
             width={80}

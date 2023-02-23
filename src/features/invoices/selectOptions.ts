@@ -1,4 +1,28 @@
-export const states = [
+export type SelectOption = {
+  label: string;
+  value: string;
+};
+
+export const selectTerms: SelectOption[] = [
+  { value: "on_receipt", label: "On receipt" },
+  { value: "30_days", label: "30 days" },
+  { value: "60_days", label: "60 days" },
+];
+
+export const selectTaxTypes: SelectOption[] = [
+  { label: "On total", value: "on_total" },
+  { label: "Deducted", value: "deducted" },
+  { label: "Per item", value: "per_item" },
+  { label: "None", value: "no_tax" },
+];
+
+export const selectDiscountTypes: SelectOption[] = [
+  { label: "None", value: "no_discount" },
+  { label: "Percent", value: "percent" },
+  { label: "Flat amount", value: "flat_amount" },
+];
+
+export const selectStates = [
   { label: "Alabama", value: "AL" },
   { label: "Alaska", value: "AK" },
   { label: "Arizona", value: "AZ" },

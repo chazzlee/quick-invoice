@@ -3,6 +3,7 @@ import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
 
 export function ExtraNotes() {
   const { register } = useInvoiceFormContext();
+
   return (
     <div className="notes-container">
       <FormControl id="notes" label="Notes">

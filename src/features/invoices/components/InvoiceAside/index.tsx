@@ -1,24 +1,14 @@
+import type { ChangeEvent } from "react";
 import { FormControl, SelectInput, TextInput } from "@/components/Inputs";
-import { ChangeEvent } from "react";
-import { useWatch } from "react-hook-form";
+import { useDiscount } from "../../hooks/useDiscount";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
-import { InvoiceFormData } from "../../types";
+import { useTax } from "../../hooks/useTax";
+import { selectDiscountTypes, selectTaxTypes } from "../../selectOptions";
 
 export function InvoiceAside() {
   const { register } = useInvoiceFormContext();
-  const taxType = useWatch<InvoiceFormData, "tax.type">({
-    name: "tax.type",
-    defaultValue: "no_tax",
-  });
-
-  const discountType = useWatch<InvoiceFormData, "discount.type">({
-    name: "discount.type",
-    defaultValue: "no_discount",
-  });
-
-  const isTaxable = taxType !== "no_tax";
-  const isPercentageDiscount = discountType === "percent";
-  const isFlatDiscount = discountType === "flat_amount";
+  const { isTaxable } = useTax();
+  const { isPercentageDiscount, isFlatDiscount } = useDiscount();
 
   return (
     <aside>
@@ -31,12 +21,7 @@ export function InvoiceAside() {
         <h3 className="font-semibold">Tax</h3>
         <FormControl id="tax-type" label="Type">
           <SelectInput
-            selectOptions={[
-              { label: "On total", value: "on_total" },
-              { label: "Deducted", value: "deducted" },
-              { label: "Per item", value: "per_item" },
-              { label: "None", value: "no_tax" },
-            ]}
+            selectOptions={selectTaxTypes}
             {...register("tax.type", {
               onChange(event: ChangeEvent<HTMLSelectElement>) {
                 // onSelectTaxChange(
@@ -62,20 +47,17 @@ export function InvoiceAside() {
         <h3 className="font-semibold">Discount</h3>
         <FormControl id="discount" label="Type">
           <SelectInput
-            selectOptions={[
-              { label: "None", value: "no_discount" },
-              { label: "Percent", value: "percent" },
-              { label: "Flat amount", value: "flat_amount" },
-            ]}
+            selectOptions={selectDiscountTypes}
             {...register("discount.type")}
           />
         </FormControl>
+        {/* TODO:FIXME: */}
         {isPercentageDiscount && (
           <FormControl id="percent" label="Percent">
             <TextInput
               width="w-1/2"
               type="number"
-              {...register("discount.value")}
+              {...register("discount.rate")}
             />
           </FormControl>
         )}
@@ -84,7 +66,7 @@ export function InvoiceAside() {
             <TextInput
               width="w-1/2"
               type="number"
-              {...register("discount.value", {
+              {...register("discount.rate", {
                 valueAsNumber: true,
                 onChange() {
                   // updateTotalDiscount();
