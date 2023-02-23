@@ -9,17 +9,28 @@ type TextInputProps = ComponentPropsWithRef<"input"> & {
   type?: HTMLInputTypeAttribute;
   inputSize?: "xs" | "sm" | "md" | "lg" | "xl";
   width?: "w-full" | "w-1/2" | "w-2/12";
+  classes?: string;
 };
 
 // eslint-disable-next-line react/display-name
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  ({ id, inputSize = "md", type = "text", width = "w-full", ...rest }, ref) => {
+  (
+    {
+      id,
+      inputSize = "md",
+      type = "text",
+      width = "w-full",
+      classes = "",
+      ...rest
+    },
+    ref
+  ) => {
     return (
       <input
         ref={ref}
         id={id}
         type={type}
-        className={`input input-bordered input-${inputSize} ${width}`}
+        className={`input input-bordered input-${inputSize} ${width} ${classes}`}
         {...rest}
       />
     );

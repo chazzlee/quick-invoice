@@ -1,5 +1,6 @@
 import Head from "next/head";
 import { Inter } from "@next/font/google";
+import { InvoiceForm } from "@/features/invoices/components/InvoiceForm";
 
 export default function Home() {
   return (
@@ -10,8 +11,14 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>
-        <h1>Hello</h1>
+      <main className="container mx-auto">
+        <section className="grid grid-cols-[3fr_1fr] pt-16 gap-8">
+          <article className="py-8 mb-20 bg-white border-t-4 border-b-4 border-gray-600">
+            <InvoiceForm />
+          </article>
+
+          <aside>ASIDE</aside>
+        </section>
       </main>
     </>
   );
