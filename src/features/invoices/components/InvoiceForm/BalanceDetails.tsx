@@ -1,13 +1,17 @@
 import { formatCurrency } from "@/utils/formatCurrency";
-import { useBalance } from "../../hooks/useBalance";
-import { useDiscount } from "../../hooks/useDiscount";
-import { useTax } from "../../hooks/useTax";
 
 export function BalanceDetails() {
-  const { isTaxable, taxRate, totalTax } = useTax();
-  const { isDiscountable, isPercentageDiscount, discountRate, totalDiscount } =
-    useDiscount();
-  const { subtotal, total, balanceDue } = useBalance();
+  const subtotal = 0;
+  const isDiscountable = false;
+  const isPercentageDiscount = false;
+  const discountRate = 0;
+  const totalDiscount = 0;
+
+  const isTaxable = false;
+  const taxRate = 0;
+  const totalTax = 0;
+  const total = 0;
+  const balanceDue = 0;
 
   return (
     <div className="grid grid-cols-2 gap-8 pt-4">

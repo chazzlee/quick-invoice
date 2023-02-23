@@ -9,7 +9,7 @@ export function ExtraNotes() {
       <FormControl id="notes" label="Notes">
         <Textarea
           placeholder="Notes - additional terms and conditions"
-          {...register("notes")}
+          {...register("invoice.notes")}
         />
       </FormControl>
     </div>

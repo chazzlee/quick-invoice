@@ -29,21 +29,26 @@ export const defaultInvoice: InvoiceFormData = {
   invoice: {
     number: "INV0001",
     date: null,
+    notes: "",
     terms: {
       type: "on_receipt",
       dueDate: null,
     },
   },
-  tax: { type: "no_tax", rate: 0 },
+  tax: {
+    type: "no_tax",
+    rate: 0,
+  },
   discount: {
     type: "no_discount",
-    value: 0,
+    rate: 0,
   },
   lineItems: [{ ...defaultLineItem }],
-  notes: "",
-  subtotal: 0,
-  total: 0,
-  totalTax: 0,
-  totalDiscount: 0,
-  balanceDue: 0,
+  balance: {
+    subtotal: 0,
+    total: 0,
+    totalTax: 0,
+    totalDiscount: 0,
+    balanceDue: 0,
+  },
 };

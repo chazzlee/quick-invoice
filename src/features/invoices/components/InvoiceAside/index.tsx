@@ -1,14 +1,18 @@
-import type { ChangeEvent } from "react";
+import { ChangeEvent, useEffect } from "react";
 import { FormControl, SelectInput, TextInput } from "@/components/Inputs";
 import { useDiscount } from "../../hooks/useDiscount";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
 import { useTax } from "../../hooks/useTax";
 import { selectDiscountTypes, selectTaxTypes } from "../../selectOptions";
+import { useLineItems } from "../../hooks/useLineItems";
+import { useBalance } from "../../hooks/useBalance";
 
 export function InvoiceAside() {
-  const { register } = useInvoiceFormContext();
-  const { isTaxable } = useTax();
-  const { isPercentageDiscount, isFlatDiscount } = useDiscount();
+  const { register, watch } = useInvoiceFormContext();
+
+  const isTaxable = false;
+  const isPercentageDiscount = false;
+  const isFlatDiscount = false;
 
   return (
     <aside>
@@ -23,11 +27,7 @@ export function InvoiceAside() {
           <SelectInput
             selectOptions={selectTaxTypes}
             {...register("tax.type", {
-              onChange(event: ChangeEvent<HTMLSelectElement>) {
-                // onSelectTaxChange(
-                //   event.target.value as InvoiceFormData["tax"]["type"]
-                // );
-              },
+              onChange() {},
             })}
           />
         </FormControl>
@@ -37,7 +37,10 @@ export function InvoiceAside() {
               type="number"
               min={0}
               width="w-1/2"
-              {...register("tax.rate", { valueAsNumber: true })}
+              {...register("tax.rate", {
+                valueAsNumber: true,
+                onChange() {},
+              })}
             />
           </FormControl>
         ) : null}
@@ -57,7 +60,7 @@ export function InvoiceAside() {
             <TextInput
               width="w-1/2"
               type="number"
-              {...register("discount.rate")}
+              {...register("discount.rate", { valueAsNumber: true })}
             />
           </FormControl>
         )}
@@ -68,9 +71,7 @@ export function InvoiceAside() {
               type="number"
               {...register("discount.rate", {
                 valueAsNumber: true,
-                onChange() {
-                  // updateTotalDiscount();
-                },
+                onChange() {},
               })}
             />
           </FormControl>

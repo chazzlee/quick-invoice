@@ -1,11 +1,11 @@
 import { FormControl, SelectInput, TextInput } from "@/components/Inputs";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
-import { useTerms } from "../../hooks/useTerms";
 import { selectTerms } from "../../selectOptions";
 
 export function InvoiceDetails() {
   const { register } = useInvoiceFormContext();
-  const { hasDueDate } = useTerms();
+  // const { hasDueDate } = useTerms();
+  const hasDueDate = false;
 
   return (
     <div className="invoice-details">

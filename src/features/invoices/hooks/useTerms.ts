@@ -1,11 +1,21 @@
 import { useWatchInvoice } from "./useWatchInvoice";
 
 export function useTerms() {
-  const termsType = useWatchInvoice("invoice.terms.type");
-  const invoiceNumber = useWatchInvoice("invoice.number");
-  const invoiceDate = useWatchInvoice("invoice.date");
-  const dueDate = useWatchInvoice("invoice.terms.dueDate");
+  const { invoice } = useWatchInvoice();
+
+  const termsType = invoice.terms.type;
+  const dueDate = invoice.terms.dueDate;
+  const invoiceNumber = invoice.number;
+  const invoiceDate = invoice.date;
+  const extraNotes = invoice.notes;
   const hasDueDate = termsType !== "on_receipt";
 
-  return { hasDueDate, dueDate, termsType, invoiceNumber, invoiceDate };
+  return {
+    hasDueDate,
+    dueDate,
+    termsType,
+    invoiceNumber,
+    invoiceDate,
+    extraNotes,
+  };
 }

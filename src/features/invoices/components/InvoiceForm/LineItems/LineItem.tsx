@@ -1,5 +1,8 @@
 import { Textarea, TextInput } from "@/components/Inputs";
+import { useBalance } from "@/features/invoices/hooks/useBalance";
 import { useInvoiceFormContext } from "@/features/invoices/hooks/useInvoiceFormContext";
+import { useLineItem } from "@/features/invoices/hooks/useLineItem";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 type LineItemProps = {
   readonly index: number;
@@ -9,6 +12,9 @@ type LineItemProps = {
 
 export function LineItem({ index, isTaxable, onRemove }: LineItemProps) {
   const { register } = useInvoiceFormContext();
+  // const { lineItem, onUpdateAmount } = useLineItem(index);
+  // const { onUpdateTotalTax, onUpdateSubtotal, onUpdateTotal } = useBalance();
+  const amount = 0;
 
   return (
     <div className="relative flex gap-4 py-2 pl-8 border-b border-gray-300">
@@ -42,6 +48,7 @@ export function LineItem({ index, isTaxable, onRemove }: LineItemProps) {
         width="w-2/12"
         {...register(`lineItems.${index}.rate`, {
           valueAsNumber: true,
+          onChange() {},
         })}
       />
       <TextInput
@@ -52,10 +59,11 @@ export function LineItem({ index, isTaxable, onRemove }: LineItemProps) {
         width="w-2/12"
         {...register(`lineItems.${index}.quantity`, {
           valueAsNumber: true,
+          onChange() {},
         })}
       />
-      {/* TODO: */}
-      <p className="w-2/12 mt-3">$33.00</p>
+
+      <p className="w-2/12 mt-3 amount">{formatCurrency(amount)}</p>
 
       {isTaxable ? (
         <div className="w-1/12 mt-3">
@@ -63,10 +71,7 @@ export function LineItem({ index, isTaxable, onRemove }: LineItemProps) {
             type="checkbox"
             className="checkbox"
             {...register(`lineItems.${index}.taxable`, {
-              onChange() {
-                console.log("update total tax...");
-                // updateTotalTax();
-              },
+              onChange() {},
             })}
             defaultChecked={isTaxable}
           />

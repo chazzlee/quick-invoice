@@ -1,9 +1,11 @@
 import type { Nullable } from "@/utils/types";
 
 type TermsType = "on_receipt" | "30_days" | "60_days";
+
 export type InvoiceDetails = {
   number: string;
   date: Nullable<Date>;
+  notes: string;
   terms: {
     type: TermsType;
     dueDate: Nullable<Date>;
@@ -54,26 +56,3 @@ export type InvoiceFormData = {
   tax: { type: TaxType; rate: number };
   lineItems: LineItem[];
 };
-
-// export type InvoiceFormData = {
-//   title: string;
-//   logo: Nullable<FileList>;
-//   from: GeneralDetails;
-//   to: GeneralDetails;
-//   invoice: InvoiceDetails;
-//   lineItems: LineItem[];
-//   notes: string;
-//   subtotal: number;
-//   totalTax: number;
-//   totalDiscount: number;
-//   total: number;
-//   balanceDue: number;
-//   tax: {
-//     type: TaxType;
-//     rate: number;
-//   };
-//   discount: {
-//     type: DiscountType;
-//     rate: number;
-//   };
-// };

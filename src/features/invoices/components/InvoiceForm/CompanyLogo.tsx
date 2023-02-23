@@ -1,11 +1,11 @@
 import Image from "next/image";
 import { FileInput, FormControl } from "@/components/Inputs";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
-import { useLogo } from "../../hooks/useLogo";
 
 export function CompanyLogo() {
   const { register } = useInvoiceFormContext();
-  const companyLogo = useLogo();
+  // const companyLogo = useLogo();
+  const companyLogo = null;
 
   return (
     <div className="image-preview">

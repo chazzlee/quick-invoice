@@ -1,16 +1,17 @@
 import { useWatchInvoice } from "./useWatchInvoice";
 
 export function useDiscount() {
-  const discountType = useWatchInvoice("discount.type");
-  const discountRate = useWatchInvoice("discount.rate");
+  const {
+    discount: { type, rate },
+  } = useWatchInvoice();
 
-  const isDiscountable = discountType !== "no_discount";
-  const isPercentageDiscount = discountType === "percent";
-  const isFlatDiscount = discountType === "flat_amount";
+  const isDiscountable = type !== "no_discount";
+  const isPercentageDiscount = type === "percent";
+  const isFlatDiscount = type === "flat_amount";
 
   return {
-    discountType,
-    discountRate,
+    discountType: type,
+    discountRate: rate,
     isDiscountable,
     isPercentageDiscount,
     isFlatDiscount,

@@ -1,13 +1,17 @@
 import { useWatchInvoice } from "./useWatchInvoice";
 
 export function useTax() {
-  const taxType = useWatchInvoice("tax.type");
-  const taxRate = useWatchInvoice("tax.rate");
-  const isTaxable = taxType !== "no_tax";
+  const { tax } = useWatchInvoice();
+  const taxType = tax.type;
+  const taxRate = tax.rate;
+
+  const isNotTaxable = taxType === "no_tax";
+  const isTaxable = ["on_total", "deducted", "per_item"].includes(taxType);
 
   return {
     taxType,
     taxRate,
     isTaxable,
+    isNotTaxable,
   };
 }
