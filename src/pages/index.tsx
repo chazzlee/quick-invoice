@@ -1,8 +1,14 @@
 import Head from "next/head";
 import { Inter } from "@next/font/google";
 import { InvoiceForm } from "@/features/invoices/components/InvoiceForm";
+import { InvoiceAside } from "@/features/invoices/components/InvoiceAside";
+import { FormProvider, useForm } from "react-hook-form";
+import { defaultInvoice } from "@/features/invoices/defaults";
+import type { InvoiceFormData } from "@/features/invoices/types";
 
 export default function Home() {
+  const methods = useForm<InvoiceFormData>({ defaultValues: defaultInvoice });
+
   return (
     <>
       <Head>
@@ -12,13 +18,15 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="container mx-auto">
-        <section className="grid grid-cols-[3fr_1fr] pt-16 gap-8">
-          <article className="py-8 mb-20 bg-white border-t-4 border-b-4 border-gray-600">
-            <InvoiceForm />
-          </article>
+        <FormProvider {...methods}>
+          <section className="grid grid-cols-[3fr_1fr] pt-16 gap-8">
+            <article className="py-8 mb-20 bg-white border-t-4 border-b-4 border-gray-600">
+              <InvoiceForm />
+            </article>
 
-          <aside>ASIDE</aside>
-        </section>
+            <InvoiceAside />
+          </section>
+        </FormProvider>
       </main>
     </>
   );
