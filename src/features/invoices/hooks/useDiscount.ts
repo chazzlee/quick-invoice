@@ -1,22 +1,14 @@
-import { useWatch } from "react-hook-form";
-import { InvoiceFormData } from "../types";
+import { useWatchInvoice } from "./useWatchInvoice";
 
 export function useDiscount() {
-  const totalDiscount = useWatch<InvoiceFormData, "totalDiscount">({
-    name: "totalDiscount",
-  });
-  const discountType = useWatch<InvoiceFormData, "discount.type">({
-    name: "discount.type",
-  });
-  const discountRate = useWatch<InvoiceFormData, "discount.rate">({
-    name: "discount.rate",
-  });
+  const discountType = useWatchInvoice("discount.type");
+  const discountRate = useWatchInvoice("discount.rate");
+
   const isDiscountable = discountType !== "no_discount";
   const isPercentageDiscount = discountType === "percent";
   const isFlatDiscount = discountType === "flat_amount";
 
   return {
-    totalDiscount,
     discountType,
     discountRate,
     isDiscountable,

@@ -1,22 +1,13 @@
-import { useWatch } from "react-hook-form";
-import type { InvoiceFormData } from "../types";
+import { useWatchInvoice } from "./useWatchInvoice";
 
 export function useTax() {
-  const taxType = useWatch<InvoiceFormData, "tax.type">({
-    name: "tax.type",
-  });
-  const taxRate = useWatch<InvoiceFormData, "tax.rate">({
-    name: "tax.rate",
-  });
-  const totalTax = useWatch<InvoiceFormData, "totalTax">({
-    name: "totalTax",
-  });
+  const taxType = useWatchInvoice("tax.type");
+  const taxRate = useWatchInvoice("tax.rate");
   const isTaxable = taxType !== "no_tax";
 
   return {
     taxType,
     taxRate,
-    totalTax,
     isTaxable,
   };
 }

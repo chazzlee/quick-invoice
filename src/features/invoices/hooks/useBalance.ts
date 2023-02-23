@@ -1,15 +1,16 @@
-import { useWatch } from "react-hook-form";
-import type { InvoiceFormData } from "../types";
+import { useWatchInvoice } from "./useWatchInvoice";
 
 export function useBalance() {
-  const subtotal = useWatch<InvoiceFormData, "subtotal">({ name: "subtotal" });
-  const total = useWatch<InvoiceFormData, "total">({ name: "total" });
-  const balanceDue = useWatch<InvoiceFormData, "balanceDue">({
-    name: "balanceDue",
-  });
+  const subtotal = useWatchInvoice("balance.subtotal");
+  const total = useWatchInvoice("balance.total");
+  const totalTax = useWatchInvoice("balance.totalTax");
+  const totalDiscount = useWatchInvoice("balance.totalDiscount");
+  const balanceDue = useWatchInvoice("balance.balanceDue");
 
   return {
     subtotal,
+    totalTax,
+    totalDiscount,
     total,
     balanceDue,
   };

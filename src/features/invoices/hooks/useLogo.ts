@@ -1,7 +1,6 @@
-import { useWatch } from "react-hook-form";
-import { InvoiceFormData } from "../types";
+import { useWatchInvoice } from "./useWatchInvoice";
 
 export function useLogo() {
-  const logo = useWatch<InvoiceFormData, "logo">({ name: "logo" });
-  return logo?.[0];
+  const logo = useWatchInvoice("logo");
+  return logo?.item(0);
 }

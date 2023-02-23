@@ -13,7 +13,7 @@ import {
   TextInput,
   Textarea,
 } from "@/components/Inputs";
-import { Address, GeneralDetails } from "@/components/GeneralDetails";
+import { Address, GeneralDetails } from "@/components/__XXGeneralDetails";
 import { isKeyOf } from "@/utils/isKey";
 import type { Nullable } from "@/utils/types";
 import { ChangeEvent, useCallback, useEffect } from "react";
