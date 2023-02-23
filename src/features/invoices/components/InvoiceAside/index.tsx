@@ -1,18 +1,16 @@
-import { ChangeEvent, useEffect } from "react";
 import { FormControl, SelectInput, TextInput } from "@/components/Inputs";
-import { useDiscount } from "../../hooks/useDiscount";
-import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
-import { useTax } from "../../hooks/useTax";
 import { selectDiscountTypes, selectTaxTypes } from "../../selectOptions";
-import { useLineItems } from "../../hooks/useLineItems";
-import { useBalance } from "../../hooks/useBalance";
+import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
+import { useWatchInvoice } from "../../hooks/useWatchInvoice";
 
 export function InvoiceAside() {
-  const { register, watch } = useInvoiceFormContext();
+  const { register } = useInvoiceFormContext();
+  const isTaxable = useWatchInvoice("tax.type") !== "no_tax";
 
-  const isTaxable = false;
-  const isPercentageDiscount = false;
-  const isFlatDiscount = false;
+  // FIXME: TODO:
+  const discountType = useWatchInvoice("discount.type");
+  const isPercentageDiscount = discountType === "percent";
+  const isFlatDiscount = discountType === "flat_amount";
 
   return (
     <aside>

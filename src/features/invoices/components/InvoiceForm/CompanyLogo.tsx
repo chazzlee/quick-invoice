@@ -1,16 +1,20 @@
 import Image from "next/image";
 import { FileInput, FormControl } from "@/components/Inputs";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
+import { useWatch } from "react-hook-form";
+import type { InvoiceFormData } from "../../types";
+import { useWatchInvoice } from "../../hooks/useWatchInvoice";
 
 export function CompanyLogo() {
   const { register } = useInvoiceFormContext();
-  // const companyLogo = useLogo();
-  const companyLogo = null;
+
+  const fileList = useWatchInvoice("logo"); //TODO: just store image/file, not FileList
+  const companyLogo = fileList?.item(0);
 
   return (
     <div className="image-preview">
       <FormControl id="logo" label="Company logo">
-        <FileInput {...register("logo")} />
+        <FileInput {...register("logo")} accept="image/*" />
       </FormControl>
       <div className="w-1/2 mt-8 bg-white border h-28 logo-preview">
         {companyLogo ? (

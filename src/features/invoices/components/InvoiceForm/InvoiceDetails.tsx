@@ -1,11 +1,14 @@
 import { FormControl, SelectInput, TextInput } from "@/components/Inputs";
+import { useWatch } from "react-hook-form";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
+import { useWatchInvoice } from "../../hooks/useWatchInvoice";
 import { selectTerms } from "../../selectOptions";
+import type { InvoiceFormData } from "../../types";
 
 export function InvoiceDetails() {
   const { register } = useInvoiceFormContext();
-  // const { hasDueDate } = useTerms();
-  const hasDueDate = false;
+  const termsType = useWatchInvoice("invoice.terms.type");
+  const hasDueDate = termsType !== "on_receipt";
 
   return (
     <div className="invoice-details">

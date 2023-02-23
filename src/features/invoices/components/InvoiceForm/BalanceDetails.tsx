@@ -1,17 +1,19 @@
 import { formatCurrency } from "@/utils/formatCurrency";
+import { useWatchInvoice } from "../../hooks/useWatchInvoice";
 
 export function BalanceDetails() {
+  // TODO:
   const subtotal = 0;
-  const isDiscountable = false;
-  const isPercentageDiscount = false;
-  const discountRate = 0;
   const totalDiscount = 0;
-
-  const isTaxable = false;
-  const taxRate = 0;
   const totalTax = 0;
   const total = 0;
   const balanceDue = 0;
+
+  const isDiscountable = useWatchInvoice("discount.type") !== "no_discount";
+  const isPercentageDiscount = useWatchInvoice("discount.type") === "percent";
+  const discountRate = useWatchInvoice("discount.rate");
+  const isTaxable = useWatchInvoice("tax.type") !== "no_tax";
+  const taxRate = useWatchInvoice("tax.rate");
 
   return (
     <div className="grid grid-cols-2 gap-8 pt-4">

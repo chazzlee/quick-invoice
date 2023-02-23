@@ -1,12 +1,6 @@
-import { useWatch } from "react-hook-form";
+import { useWatch, type FieldPath } from "react-hook-form";
 import type { InvoiceFormData } from "../types";
-import { useInvoiceFormContext } from "./useInvoiceFormContext";
 
-export function useWatchInvoice() {
-  const { getValues } = useInvoiceFormContext();
-
-  return {
-    ...useWatch<InvoiceFormData>(),
-    ...getValues(),
-  };
+export function useWatchInvoice<K extends FieldPath<InvoiceFormData>>(name: K) {
+  return useWatch<InvoiceFormData, K>({ name });
 }

@@ -12,8 +12,6 @@ type LineItemProps = {
 
 export function LineItem({ index, isTaxable, onRemove }: LineItemProps) {
   const { register } = useInvoiceFormContext();
-  // const { lineItem, onUpdateAmount } = useLineItem(index);
-  // const { onUpdateTotalTax, onUpdateSubtotal, onUpdateTotal } = useBalance();
   const amount = 0;
 
   return (

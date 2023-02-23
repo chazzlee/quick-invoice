@@ -1,14 +1,13 @@
-import { useTax } from "@/features/invoices/hooks/useTax";
-import { useLineItems } from "@/features/invoices/hooks/useLineItems";
+import { useFieldArray } from "react-hook-form";
 import { LineItemsHeader } from "./LineItemsHeader";
 import { LineItem } from "./LineItem";
 import { AddMoreButton } from "./AddMoreButton";
-import { useFieldArray } from "react-hook-form";
-import { InvoiceFormData } from "@/features/invoices/types";
+import type { InvoiceFormData } from "@/features/invoices/types";
+import { useWatchInvoice } from "@/features/invoices/hooks/useWatchInvoice";
 
 export function LineItems() {
-  // const { fields, onClear, onRemove, onAddMore } = useLineItems();
-  const isTaxable = false;
+  const isTaxable = useWatchInvoice("tax.type") !== "no_tax";
+
   const { fields, append, remove, replace } = useFieldArray<InvoiceFormData>({
     name: "lineItems",
   });
