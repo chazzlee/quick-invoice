@@ -1,8 +1,9 @@
 import { Textarea, TextInput } from "@/components/Inputs";
-import { useBalance } from "@/features/invoices/hooks/useBalance";
 import { useInvoiceFormContext } from "@/features/invoices/hooks/useInvoiceFormContext";
-import { useLineItem } from "@/features/invoices/hooks/useLineItem";
+import { useWatchInvoice } from "@/features/invoices/hooks/useWatchInvoice";
+
 import { formatCurrency } from "@/utils/formatCurrency";
+import { useEffect } from "react";
 
 type LineItemProps = {
   readonly index: number;
@@ -12,7 +13,14 @@ type LineItemProps = {
 
 export function LineItem({ index, isTaxable, onRemove }: LineItemProps) {
   const { register } = useInvoiceFormContext();
-  const amount = 0;
+  let rate = useWatchInvoice(`lineItems.${index}.rate`);
+
+  if (Number.isNaN(rate)) {
+    rate = 0;
+  }
+
+  const quantity = useWatchInvoice(`lineItems.${index}.quantity`);
+  const amount = rate * quantity;
 
   return (
     <div className="relative flex gap-4 py-2 pl-8 border-b border-gray-300">

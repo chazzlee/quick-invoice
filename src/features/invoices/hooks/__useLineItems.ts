@@ -3,7 +3,7 @@ import { useFieldArray } from "react-hook-form";
 import { defaultLineItem } from "../defaults";
 import type { InvoiceFormData } from "../types";
 import { useInvoiceFormContext } from "./useInvoiceFormContext";
-import { useWatchInvoice } from "./useWatchInvoice";
+// import { useWatchInvoice } from "./useWatchInvoice";
 
 export function useLineItems() {
   const { getValues } = useInvoiceFormContext();
@@ -11,7 +11,7 @@ export function useLineItems() {
     name: "lineItems",
   });
 
-  const { lineItems } = useWatchInvoice();
+  // const { lineItems } = useWatchInvoice();
 
   const onClear = useCallback(
     () => replace([{ ...defaultLineItem }]),
