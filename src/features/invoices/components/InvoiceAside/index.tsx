@@ -8,7 +8,7 @@ import { DiscountType, TaxType } from "../../types";
 // TODO: need to reset discount to 0 on none
 
 export function InvoiceAside() {
-  const { register, setValue, getValues } = useInvoiceFormContext();
+  const { register, setValue, getValues, resetField } = useInvoiceFormContext();
   const isTaxable = useWatchInvoice("tax.type") !== "no_tax";
 
   // FIXME: TODO:
@@ -40,6 +40,8 @@ export function InvoiceAside() {
                         taxable: false,
                       }))
                     );
+                    setValue("tax.rate", 0);
+                    setValue("balance.totalTax", 0);
                   } else if (taxType === "on_total") {
                     setValue(
                       "lineItems",
@@ -57,6 +59,22 @@ export function InvoiceAside() {
                         0
                       );
                     setValue("balance.totalTax", totalTax);
+                  } else if (taxType === "deducted") {
+                    setValue(
+                      "lineItems",
+                      getValues("lineItems").map((item) => ({
+                        ...item,
+                        taxable: true,
+                      }))
+                    );
+                    const totalTax = getValues("lineItems")
+                      .filter((lineItem) => lineItem.taxable)
+                      .reduce(
+                        (acc, prev) =>
+                          acc + prev.amount * (getValues("tax.rate") / 100),
+                        0
+                      );
+                    setValue("balance.totalTax", totalTax * -1);
                   }
                 },
               })}
@@ -71,14 +89,26 @@ export function InvoiceAside() {
                 {...register("tax.rate", {
                   valueAsNumber: true,
                   onChange() {
-                    const totalTax = getValues("lineItems")
-                      .filter((lineItem) => lineItem.taxable)
-                      .reduce(
-                        (acc, prev) =>
-                          acc + prev.amount * (getValues("tax.rate") / 100),
-                        0
-                      );
-                    setValue("balance.totalTax", totalTax);
+                    const taxType = getValues("tax.type");
+                    if (taxType === "on_total") {
+                      const totalTax = getValues("lineItems")
+                        .filter((lineItem) => lineItem.taxable)
+                        .reduce(
+                          (acc, prev) =>
+                            acc + prev.amount * (getValues("tax.rate") / 100),
+                          0
+                        );
+                      setValue("balance.totalTax", totalTax);
+                    } else if (taxType === "deducted") {
+                      const totalTax = getValues("lineItems")
+                        .filter((lineItem) => lineItem.taxable)
+                        .reduce(
+                          (acc, prev) =>
+                            acc + prev.amount * (getValues("tax.rate") / 100),
+                          0
+                        );
+                      setValue("balance.totalTax", totalTax * -1);
+                    }
                   },
                 })}
               />
@@ -104,6 +134,7 @@ export function InvoiceAside() {
                       getValues("balance.subtotal") * discountPercentage;
                     setValue("balance.totalDiscount", totalDiscount);
                   } else {
+                    setValue("discount.rate", 0);
                     setValue("balance.totalDiscount", 0);
                   }
                 },

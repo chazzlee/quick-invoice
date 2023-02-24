@@ -1,7 +1,7 @@
 import { Textarea, TextInput } from "@/components/Inputs";
 import { useInvoiceFormContext } from "@/features/invoices/hooks/useInvoiceFormContext";
 import { useWatchInvoice } from "@/features/invoices/hooks/useWatchInvoice";
-import { LineItem, TaxType } from "@/features/invoices/types";
+import { DiscountType, LineItem, TaxType } from "@/features/invoices/types";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { ChangeEvent, useCallback, useEffect } from "react";
 
@@ -27,6 +27,7 @@ export function LineItem({
     rate = 0;
   }
 
+  const subtotal = useWatchInvoice("balance.subtotal");
   const quantity = useWatchInvoice(`lineItems.${index}.quantity`);
   const amount = rate * quantity;
 
@@ -48,8 +49,24 @@ export function LineItem({
           0
         );
       setValue("balance.totalTax", totalTax);
+    } else if (taxType === "deducted") {
+      const totalTax = getValues("lineItems")
+        .filter((lineItem) => lineItem.taxable)
+        .reduce(
+          (acc, prev) => acc + prev.amount * (getValues("tax.rate") / 100),
+          0
+        );
+      setValue("balance.totalTax", totalTax * -1);
     }
   };
+
+  useEffect(() => {
+    if (getValues("discount.type") === "percent") {
+      const discountPercentage = getValues("discount.rate") / 100;
+      const totalDiscount = subtotal * discountPercentage;
+      setValue("balance.totalDiscount", totalDiscount);
+    }
+  }, [getValues, setValue, subtotal]);
 
   return (
     <div className="relative flex gap-4 py-2 pl-8 border-b border-gray-300">
@@ -114,6 +131,7 @@ export function LineItem({
                 calculateTax(taxType);
               },
             })}
+            defaultChecked={isTaxable}
           />
         </div>
       ) : null}
