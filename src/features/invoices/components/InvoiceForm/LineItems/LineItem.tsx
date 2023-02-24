@@ -1,26 +1,55 @@
 import { Textarea, TextInput } from "@/components/Inputs";
 import { useInvoiceFormContext } from "@/features/invoices/hooks/useInvoiceFormContext";
 import { useWatchInvoice } from "@/features/invoices/hooks/useWatchInvoice";
-
+import { LineItem, TaxType } from "@/features/invoices/types";
 import { formatCurrency } from "@/utils/formatCurrency";
-import { useEffect } from "react";
+import { ChangeEvent, useCallback, useEffect } from "react";
 
 type LineItemProps = {
   readonly index: number;
   readonly isTaxable: boolean;
+  onUpdate(index: number, value: LineItem): void;
   onRemove(index: number): void;
 };
 
-export function LineItem({ index, isTaxable, onRemove }: LineItemProps) {
-  const { register } = useInvoiceFormContext();
-  let rate = useWatchInvoice(`lineItems.${index}.rate`);
+// TODO:
+export function LineItem({
+  index,
+  isTaxable,
+  onUpdate,
+  onRemove,
+}: LineItemProps) {
+  const { register, setValue, getValues } = useInvoiceFormContext();
+  const taxType = useWatchInvoice("tax.type");
 
+  let rate = useWatchInvoice(`lineItems.${index}.rate`);
   if (Number.isNaN(rate)) {
     rate = 0;
   }
 
   const quantity = useWatchInvoice(`lineItems.${index}.quantity`);
   const amount = rate * quantity;
+
+  useEffect(() => {
+    setValue(`lineItems.${index}.amount`, amount);
+    const subtotal = getValues("lineItems").reduce(
+      (acc, prev) => acc + prev.amount,
+      0
+    );
+    setValue("balance.subtotal", subtotal);
+  }, [amount, getValues, index, setValue]);
+
+  const calculateTax = (taxType: TaxType) => {
+    if (taxType === "on_total") {
+      const totalTax = getValues("lineItems")
+        .filter((lineItem) => lineItem.taxable)
+        .reduce(
+          (acc, prev) => acc + prev.amount * (getValues("tax.rate") / 100),
+          0
+        );
+      setValue("balance.totalTax", totalTax);
+    }
+  };
 
   return (
     <div className="relative flex gap-4 py-2 pl-8 border-b border-gray-300">
@@ -54,7 +83,9 @@ export function LineItem({ index, isTaxable, onRemove }: LineItemProps) {
         width="w-2/12"
         {...register(`lineItems.${index}.rate`, {
           valueAsNumber: true,
-          onChange() {},
+          onChange() {
+            calculateTax(taxType);
+          },
         })}
       />
       <TextInput
@@ -65,7 +96,9 @@ export function LineItem({ index, isTaxable, onRemove }: LineItemProps) {
         width="w-2/12"
         {...register(`lineItems.${index}.quantity`, {
           valueAsNumber: true,
-          onChange() {},
+          onChange() {
+            calculateTax(taxType);
+          },
         })}
       />
 
@@ -77,12 +110,38 @@ export function LineItem({ index, isTaxable, onRemove }: LineItemProps) {
             type="checkbox"
             className="checkbox"
             {...register(`lineItems.${index}.taxable`, {
-              onChange() {},
+              onChange(event: ChangeEvent<HTMLInputElement>) {
+                calculateTax(taxType);
+              },
             })}
-            defaultChecked={isTaxable}
           />
         </div>
       ) : null}
     </div>
   );
 }
+
+// useEffect(() => {
+//   setValue(`lineItems.${index}.amount`, amount);
+
+//   const calculatedSubTotal = getValues("lineItems").reduce(
+//     (acc, prev) => acc + prev.amount,
+//     0
+//   );
+//   setValue("balance.subtotal", calculatedSubTotal);
+
+//   const calculatedTax = getValues("lineItems")
+//     .filter((lineItem) => lineItem.taxable)
+//     .reduce(
+//       (acc, prev) => acc + prev.amount * (getValues("tax.rate") / 100),
+//       0
+//     );
+
+//   if (taxType === "on_total") {
+//     setValue("balance.totalTax", calculatedTax);
+//   } else if (taxType === "deducted") {
+//     setValue("balance.totalTax", calculatedTax * -1);
+//   } else {
+//     setValue("balance.totalTax", 0);
+//   }
+// }, [amount, getValues, index, setValue, taxType]);

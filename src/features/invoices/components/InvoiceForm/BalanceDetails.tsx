@@ -1,19 +1,31 @@
 import { formatCurrency } from "@/utils/formatCurrency";
+import { useEffect } from "react";
+import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
 import { useWatchInvoice } from "../../hooks/useWatchInvoice";
 
 export function BalanceDetails() {
+  const { setValue } = useInvoiceFormContext();
   // TODO:
-  const subtotal = 0;
-  const totalDiscount = 0;
-  const totalTax = 0;
-  const total = 0;
-  const balanceDue = 0;
 
   const isDiscountable = useWatchInvoice("discount.type") !== "no_discount";
   const isPercentageDiscount = useWatchInvoice("discount.type") === "percent";
   const discountRate = useWatchInvoice("discount.rate");
-  const isTaxable = useWatchInvoice("tax.type") !== "no_tax";
+  const discountType = useWatchInvoice("discount.type");
+  const taxType = useWatchInvoice("tax.type");
+  const isTaxable = taxType !== "no_tax";
   const taxRate = useWatchInvoice("tax.rate");
+
+  const subtotal = useWatchInvoice("balance.subtotal");
+
+  const totalTax = useWatchInvoice("balance.totalTax");
+  const totalDiscount = useWatchInvoice("balance.totalDiscount");
+  const total = useWatchInvoice("balance.total");
+  const balanceDue = useWatchInvoice("balance.balanceDue");
+
+  useEffect(() => {
+    setValue("balance.total", subtotal + totalTax - totalDiscount);
+    setValue("balance.balanceDue", total);
+  }, [setValue, subtotal, total, totalDiscount, totalTax]);
 
   return (
     <div className="grid grid-cols-2 gap-8 pt-4">
@@ -25,7 +37,7 @@ export function BalanceDetails() {
         {isDiscountable ? (
           <div className="flex justify-between w-1/2">
             <p>Discount {isPercentageDiscount && `(${discountRate}%)`}</p>
-            <p>{formatCurrency(totalDiscount)}</p>
+            <p>{formatCurrency(totalDiscount * -1)}</p>
           </div>
         ) : null}
         {isTaxable ? (
@@ -46,3 +58,27 @@ export function BalanceDetails() {
     </div>
   );
 }
+
+// useEffect(() => {
+//   switch (discountType) {
+//     case "flat_amount": {
+//       setValue("balance.totalDiscount", discountRate * -1);
+//       break;
+//     }
+//     case "percent": {
+//       setValue("balance.totalDiscount", (discountRate / 100) * subtotal * -1);
+//       break;
+//     }
+//     case "no_discount": {
+//       setValue("balance.totalDiscount", 0);
+//       break;
+//     }
+//     default:
+//       throw new Error("Invalid discount type");
+//   }
+// }, [discountRate, discountType, setValue, subtotal]);
+
+// useEffect(() => {
+//   setValue("balance.total", subtotal + totalDiscount + totalTax);
+//   setValue("balance.balanceDue", subtotal + totalDiscount + totalTax);
+// }, [setValue, subtotal, totalDiscount, totalTax]);

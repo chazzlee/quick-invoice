@@ -35,8 +35,8 @@ export type LineItem = {
   taxable: boolean;
 };
 
-type TaxType = "on_total" | "no_tax" | "deducted" | "per_item";
-type DiscountType = "no_discount" | "percent" | "flat_amount";
+export type TaxType = "on_total" | "no_tax" | "deducted" | "per_item";
+export type DiscountType = "no_discount" | "percent" | "flat_amount";
 
 export type BalanceDetails = {
   subtotal: number;
