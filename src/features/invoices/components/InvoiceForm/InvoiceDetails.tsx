@@ -1,18 +1,25 @@
 import { FormControl, SelectInput, TextInput } from "@/components/Inputs";
-import { useWatch } from "react-hook-form";
 import { useInvoiceFormValues } from "../../hooks/useInvoiceFormValues";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
 import { selectTerms } from "../../selectOptions";
 import type { TermsType } from "../../types";
+import { addDays, formatISO, startOfToday } from "date-fns";
 
-const SAMPLE_30_DAYS = "2023-06-01";
-const SAMPLE_60_DAYS = "2023-07-20";
+const getDueDate = (termsType: TermsType): string => {
+  if (termsType === "custom") {
+    return formatISO(startOfToday(), { representation: "date" });
+  }
+  const daysToAdd = parseInt(termsType, 10);
+  return formatISO(addDays(startOfToday(), daysToAdd), {
+    representation: "date",
+  });
+};
 
 export function InvoiceDetails() {
   const { register, setValue } = useInvoiceFormContext();
   const { invoice } = useInvoiceFormValues();
   const termsType = invoice.terms.type;
-  const hasDueDate = termsType !== "on_receipt";
+  const hasDueDate = termsType !== "0_days";
 
   return (
     <div className="invoice-details">
@@ -29,13 +36,7 @@ export function InvoiceDetails() {
           {...register("invoice.terms.type", {
             onChange(event) {
               const termsType = event.target.value as TermsType;
-              if (termsType === "30_days") {
-                setValue("invoice.terms.dueDate", SAMPLE_30_DAYS);
-              } else if (termsType === "60_days") {
-                setValue("invoice.terms.dueDate", SAMPLE_60_DAYS);
-              } else {
-                setValue("invoice.terms.dueDate", "");
-              }
+              setValue("invoice.terms.dueDate", getDueDate(termsType));
             },
           })}
         />

@@ -52,6 +52,26 @@ export type InvoiceFormData = {
   lineItems: LineItem[];
 };
 
-export type TermsType = "on_receipt" | "30_days" | "60_days";
+// TODO:
+export type TermsType =
+  | "0_days"
+  | "1_day"
+  | "custom"
+  | "2_days"
+  | "3_days"
+  | "4_days"
+  | "5_days"
+  | "6_days"
+  | "7_days"
+  | "14_days"
+  | "21_days"
+  | "30_days"
+  | "45_days"
+  | "60_days"
+  | "90_days"
+  | "120_days"
+  | "180_days"
+  | "365_days";
+
 export type TaxType = "on_total" | "no_tax" | "deducted" | "per_item";
 export type DiscountType = "no_discount" | "percent" | "flat_amount";

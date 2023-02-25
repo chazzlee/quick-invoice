@@ -4,9 +4,24 @@ export type SelectOption = {
 };
 
 export const selectTerms: SelectOption[] = [
-  { value: "on_receipt", label: "On receipt" },
+  { value: "0_days", label: "On receipt" },
+  { value: "1_day", label: "Next day" },
+  { value: "custom", label: "Custom" },
+  { value: "2_days", label: "2 days" },
+  { value: "3_days", label: "3 days" },
+  { value: "4_days", label: "4 days" },
+  { value: "5_days", label: "5 days" },
+  { value: "6_days", label: "6 days" },
+  { value: "7_days", label: "7 days" },
+  { value: "14_days", label: "14 days" },
+  { value: "21_days", label: "21 days" },
   { value: "30_days", label: "30 days" },
+  { value: "45_days", label: "45 days" },
   { value: "60_days", label: "60 days" },
+  { value: "90_days", label: "90 days" },
+  { value: "120_days", label: "120 days" },
+  { value: "180_days", label: "180 days" },
+  { value: "365_days", label: "365 days" },
 ];
 
 export const selectTaxTypes: SelectOption[] = [

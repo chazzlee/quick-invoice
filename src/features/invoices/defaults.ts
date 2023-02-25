@@ -1,4 +1,5 @@
 import type { GeneralDetails, InvoiceFormData, LineItem } from "./types";
+import { formatISO, startOfToday } from "date-fns";
 
 export const defaultGeneralDetails: GeneralDetails = {
   name: "",
@@ -28,10 +29,10 @@ export const defaultInvoice: InvoiceFormData = {
   to: structuredClone(defaultGeneralDetails),
   invoice: {
     number: "INV0001",
-    date: new Date().toISOString().substring(0, 10),
+    date: formatISO(startOfToday(), { representation: "date" }),
     notes: "",
     terms: {
-      type: "on_receipt",
+      type: "0_days",
       dueDate: "",
     },
   },
