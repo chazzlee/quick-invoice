@@ -1,24 +1,39 @@
 import { FormControl, SelectInput, TextInput } from "@/components/Inputs";
 import { useEffect } from "react";
+import { useWatch } from "react-hook-form";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
+import { useInvoiceWatchOne } from "../../hooks/useInvoiceFormValues";
 import { selectStates } from "../../selectOptions";
+import type { InvoiceFormData } from "../../types";
 
 type AddressDetailsProps = { id: "from" | "to" };
 
 // TODO: debounce, or trigger on blur...
 export function AddressDetails({ id }: AddressDetailsProps) {
-  const { register, watch, setValue } = useInvoiceFormContext();
+  const { register, setValue } = useInvoiceFormContext();
 
-  const city = watch(`${id}.address.city`);
-  const state = watch(`${id}.address.state`);
+  const city = useInvoiceWatchOne(`${id}.address.city`);
+  const state = useInvoiceWatchOne(`${id}.address.state`);
+  const zipCode = useInvoiceWatchOne(`${id}.address.zipCode`);
 
   useEffect(() => {
-    if (city && state) {
-      fetch(`/api/zipCode?city=${city}&state=${state}`)
+    if (zipCode.length === 5) {
+      fetch(`/api/zipCode?zipCode=${zipCode}`)
         .then((response) => response.json())
-        .then((data) => setValue(`${id}.address.zipCode`, data.zip_codes[0]));
+        .then((data) => {
+          setValue(`${id}.address.city`, data.city);
+          setValue(`${id}.address.state`, data.state);
+        });
     }
-  }, [city, id, setValue, state]);
+    //  Populate address from zipcode
+
+    // Populate zipcode from city and state
+    // if (city && state) {
+    //   fetch(`/api/zipCode?city=${city}&state=${state}`)
+    //     .then((response) => response.json())
+    //     .then((data) => setValue(`${id}.address.zipCode`, data.zip_codes[0]));
+    // }
+  }, [id, setValue, zipCode]);
 
   return (
     <div className="address">

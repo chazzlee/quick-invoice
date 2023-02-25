@@ -1,13 +1,14 @@
 import Image from "next/image";
 import { FileInput, FormControl } from "@/components/Inputs";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
-import { useInvoiceFormValues } from "../../hooks/useInvoiceFormValues";
+import { useInvoiceWatchOne } from "../../hooks/useInvoiceFormValues";
 
 export function CompanyLogo() {
   const { register } = useInvoiceFormContext();
 
-  const { logo: fileList } = useInvoiceFormValues();
-  const companyLogo = fileList?.item(0); //TODO: just store image/file, not FileList
+  //TODO: just store image/file, not FileList
+  const fileList = useInvoiceWatchOne("logo");
+  const companyLogo = fileList?.item(0);
 
   return (
     <div className="image-preview">

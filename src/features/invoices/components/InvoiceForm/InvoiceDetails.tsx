@@ -1,5 +1,5 @@
 import { FormControl, SelectInput, TextInput } from "@/components/Inputs";
-import { useInvoiceFormValues } from "../../hooks/useInvoiceFormValues";
+import { useInvoiceWatchOne } from "../../hooks/useInvoiceFormValues";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
 import { selectTerms } from "../../selectOptions";
 import type { TermsType } from "../../types";
@@ -17,8 +17,8 @@ const getDueDate = (termsType: TermsType): string => {
 
 export function InvoiceDetails() {
   const { register, setValue } = useInvoiceFormContext();
-  const { invoice } = useInvoiceFormValues();
-  const termsType = invoice.terms.type;
+
+  const termsType = useInvoiceWatchOne("invoice.terms.type");
   const hasDueDate = termsType !== "0_days";
 
   return (
