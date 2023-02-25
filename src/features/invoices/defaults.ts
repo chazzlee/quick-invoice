@@ -28,11 +28,11 @@ export const defaultInvoice: InvoiceFormData = {
   to: structuredClone(defaultGeneralDetails),
   invoice: {
     number: "INV0001",
-    date: null,
+    date: "",
     notes: "",
     terms: {
       type: "on_receipt",
-      dueDate: null,
+      dueDate: "",
     },
   },
   tax: {

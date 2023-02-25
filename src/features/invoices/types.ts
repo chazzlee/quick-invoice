@@ -1,14 +1,12 @@
 import type { Nullable } from "@/utils/types";
 
-type TermsType = "on_receipt" | "30_days" | "60_days";
-
 export type InvoiceDetails = {
   number: string;
-  date: Nullable<Date>;
+  date: string;
   notes: string;
   terms: {
     type: TermsType;
-    dueDate: Nullable<Date>;
+    dueDate: string;
   };
 };
 
@@ -35,9 +33,6 @@ export type LineItem = {
   taxable: boolean;
 };
 
-export type TaxType = "on_total" | "no_tax" | "deducted" | "per_item";
-export type DiscountType = "no_discount" | "percent" | "flat_amount";
-
 export type BalanceDetails = {
   subtotal: number;
   totalTax: number;
@@ -56,3 +51,7 @@ export type InvoiceFormData = {
   tax: { type: TaxType; rate: number };
   lineItems: LineItem[];
 };
+
+export type TermsType = "on_receipt" | "30_days" | "60_days";
+export type TaxType = "on_total" | "no_tax" | "deducted" | "per_item";
+export type DiscountType = "no_discount" | "percent" | "flat_amount";
