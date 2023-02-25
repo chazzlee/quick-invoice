@@ -1,11 +1,24 @@
 import { FormControl, SelectInput, TextInput } from "@/components/Inputs";
+import { useEffect } from "react";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
 import { selectStates } from "../../selectOptions";
 
 type AddressDetailsProps = { id: "from" | "to" };
 
+// TODO: debounce, or trigger on blur...
 export function AddressDetails({ id }: AddressDetailsProps) {
-  const { register } = useInvoiceFormContext();
+  const { register, watch, setValue } = useInvoiceFormContext();
+
+  const city = watch(`${id}.address.city`);
+  const state = watch(`${id}.address.state`);
+
+  useEffect(() => {
+    if (city && state) {
+      fetch(`/api/zipCode?city=${city}&state=${state}`)
+        .then((response) => response.json())
+        .then((data) => setValue(`${id}.address.zipCode`, data.zip_codes[0]));
+    }
+  }, [city, id, setValue, state]);
 
   return (
     <div className="address">
