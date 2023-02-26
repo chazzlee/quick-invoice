@@ -17,23 +17,24 @@ export function AddressDetails({ id }: AddressDetailsProps) {
   const zipCode = useInvoiceWatchOne(`${id}.address.zipCode`);
 
   useEffect(() => {
-    if (zipCode.length === 5) {
-      fetch(`/api/zipCode?zipCode=${zipCode}`)
-        .then((response) => response.json())
-        .then((data) => {
-          setValue(`${id}.address.city`, data.city);
-          setValue(`${id}.address.state`, data.state);
-        });
-    }
-    //  Populate address from zipcode
-
     // Populate zipcode from city and state
-    // if (city && state) {
-    //   fetch(`/api/zipCode?city=${city}&state=${state}`)
-    //     .then((response) => response.json())
-    //     .then((data) => setValue(`${id}.address.zipCode`, data.zip_codes[0]));
-    // }
-  }, [id, setValue, zipCode]);
+    if (city.length >= 2 && state.length === 2) {
+      fetch(`/api/zipCode?city=${city}&state=${state}`)
+        .then((response) => response.json())
+        .then((data) => setValue(`${id}.address.zipCode`, data.zipCode));
+    } else {
+      //  Populate address from zipcode
+      if (zipCode.length === 5) {
+        fetch(`/api/zipCode?zipCode=${zipCode}`)
+          .then((response) => response.json())
+          .then((data) => {
+            setValue(`${id}.address.city`, data.city);
+            setValue(`${id}.address.state`, data.state);
+          });
+      }
+    }
+    return () => {};
+  }, [city, id, setValue, state, zipCode]);
 
   return (
     <div className="address">
