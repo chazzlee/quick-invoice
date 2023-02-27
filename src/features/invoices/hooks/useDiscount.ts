@@ -6,7 +6,7 @@ export function useDiscount() {
   const { setValue } = useInvoiceFormContext();
   const { discount, balance } = useInvoiceFormValues();
 
-  const discountType = discount.type;
+  const discountType = discount.kind;
   const discountRate = discount.rate;
   const isDiscountable = discountType !== "no_discount";
   const isPercentageDiscount = discountType === "percent";

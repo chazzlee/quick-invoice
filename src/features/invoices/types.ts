@@ -5,7 +5,7 @@ export type InvoiceDetails = {
   date: string;
   notes: string;
   terms: {
-    type: TermsType;
+    kind: TermsType;
     dueDate: string;
   };
 };
@@ -47,8 +47,8 @@ export type InvoiceFormData = {
   to: GeneralDetails;
   invoice: InvoiceDetails;
   balance: BalanceDetails;
-  discount: { type: DiscountType; rate: number };
-  tax: { type: TaxType; rate: number };
+  discount: { kind: DiscountType; rate: number };
+  tax: { kind: TaxType; rate: number };
   lineItems: LineItem[];
 };
 

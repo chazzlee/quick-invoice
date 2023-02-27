@@ -23,7 +23,7 @@ export function InvoiceDetails() {
     formState: { errors },
   } = useInvoiceFormContext();
 
-  const termsType = useInvoiceWatchOne("invoice.terms.type");
+  const termsType = useInvoiceWatchOne("invoice.terms.kind");
   const hasDueDate = termsType !== "0_days";
 
   return (
@@ -58,9 +58,9 @@ export function InvoiceDetails() {
       <FormControl id="invoice-terms" label="Terms">
         <SelectInput
           defaultLabel="Choose terms"
-          classes={`${errors.invoice?.terms ? "input-error" : ""}`}
+          classes={`${errors.invoice?.terms?.kind ? "input-error" : ""}`}
           selectOptions={selectTerms}
-          {...register("invoice.terms.type", {
+          {...register("invoice.terms.kind", {
             onChange(event) {
               const termsType = event.target.value as TermsType;
               setValue("invoice.terms.dueDate", getDueDate(termsType));

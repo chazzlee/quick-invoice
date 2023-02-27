@@ -9,7 +9,7 @@ import type { InvoiceFormData } from "@/features/invoices/types";
 
 export default function Home() {
   const methods = useForm<InvoiceFormData>({
-    mode: "onTouched",
+    mode: "onSubmit",
     defaultValues: defaultInvoice,
   });
 

@@ -34,7 +34,7 @@ export function InvoiceAside() {
           <FormControl id="tax-type" label="Type">
             <SelectInput
               selectOptions={selectTaxTypes}
-              {...register("tax.type", {
+              {...register("tax.kind", {
                 onChange(event: ChangeEvent<HTMLSelectElement>) {
                   const taxType = event.target.value as TaxType;
                   if (taxType !== "no_tax") {
@@ -65,6 +65,7 @@ export function InvoiceAside() {
                 type="number"
                 min={0}
                 width="w-1/2"
+                classes={`${errors.tax?.rate ? "input-error" : ""}`}
                 {...register("tax.rate", {
                   valueAsNumber: true,
                   required: {
@@ -84,7 +85,7 @@ export function InvoiceAside() {
           <FormControl id="discount" label="Type">
             <SelectInput
               selectOptions={selectDiscountTypes}
-              {...register("discount.type", {
+              {...register("discount.kind", {
                 onChange(event: ChangeEvent<HTMLSelectElement>) {
                   if ((event.target.value as DiscountType) === "no_discount") {
                     setValue("discount.rate", 0);

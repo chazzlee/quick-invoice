@@ -9,7 +9,7 @@ export function useTax() {
   const { tax, lineItems } = useInvoiceFormValues();
   const { replace } = useInvoiceFieldArray();
 
-  const taxType = tax.type;
+  const taxType = tax.kind;
   const taxRate = tax.rate;
   const isTaxable = taxType !== "no_tax";
 
