@@ -7,6 +7,7 @@ export function CompanyLogo() {
   const { register } = useInvoiceFormContext();
 
   //TODO: just store image/file, not FileList
+  //FIXME: fix error when going back
   const fileList = useInvoiceWatchOne("logo");
   const companyLogo = fileList?.item(0);
 
