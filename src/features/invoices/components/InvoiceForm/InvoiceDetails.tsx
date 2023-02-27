@@ -35,6 +35,7 @@ export function InvoiceDetails() {
       >
         <TextInput
           width="w-1/2"
+          classes={`${errors.invoice?.number ? "input-error" : ""}`}
           {...register("invoice.number", {
             required: { value: true, message: "invoice number is required" },
           })}
@@ -48,6 +49,7 @@ export function InvoiceDetails() {
         <TextInput
           type="date"
           width="w-1/2"
+          classes={`${errors.invoice?.date ? "input-error" : ""}`}
           {...register("invoice.date", {
             required: { value: true, message: "invoice date is required" },
           })}
@@ -56,6 +58,7 @@ export function InvoiceDetails() {
       <FormControl id="invoice-terms" label="Terms">
         <SelectInput
           defaultLabel="Choose terms"
+          classes={`${errors.invoice?.terms ? "input-error" : ""}`}
           selectOptions={selectTerms}
           {...register("invoice.terms.type", {
             onChange(event) {
@@ -76,6 +79,7 @@ export function InvoiceDetails() {
         >
           <TextInput
             type="date"
+            classes={`${errors.invoice?.terms?.dueDate ? "input-error" : ""}`}
             width="w-1/2"
             {...register("invoice.terms.dueDate", {
               required: { value: hasDueDate, message: "Due date is required" },

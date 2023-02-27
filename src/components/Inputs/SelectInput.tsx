@@ -3,17 +3,18 @@ import { type ComponentPropsWithRef, forwardRef } from "react";
 
 type SelectInputProps = ComponentPropsWithRef<"select"> & {
   selectOptions: SelectOption[];
+  classes?: string;
   defaultLabel?: string;
 };
 
 // TODO: default selected
 // eslint-disable-next-line react/display-name
 export const SelectInput = forwardRef<HTMLSelectElement, SelectInputProps>(
-  ({ defaultLabel, selectOptions = [], ...rest }, ref) => {
+  ({ defaultLabel, selectOptions = [], classes = "", ...rest }, ref) => {
     return (
       <select
         ref={ref}
-        className="w-1/2 select select-bordered select-md"
+        className={`w-1/2 select select-bordered select-md ${classes}`}
         {...rest}
         defaultValue="default"
       >

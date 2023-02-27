@@ -1,14 +1,17 @@
 import Head from "next/head";
 import { Inter } from "@next/font/google";
+import { useEffect } from "react";
 import { InvoiceForm } from "@/features/invoices/components/InvoiceForm";
 import { InvoiceAside } from "@/features/invoices/components/InvoiceAside";
 import { FormProvider, useForm } from "react-hook-form";
 import { defaultInvoice } from "@/features/invoices/defaults";
 import type { InvoiceFormData } from "@/features/invoices/types";
-import { useEffect } from "react";
 
 export default function Home() {
-  const methods = useForm<InvoiceFormData>({ defaultValues: defaultInvoice });
+  const methods = useForm<InvoiceFormData>({
+    mode: "onTouched",
+    defaultValues: defaultInvoice,
+  });
 
   useEffect(() => {
     const invoice = window?.sessionStorage.getItem("invoice");
@@ -25,7 +28,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="container pt-8 mx-auto">
+      <main className="container px-16 pt-8 mx-auto">
         <div className="mb-4">
           <button
             type="button"

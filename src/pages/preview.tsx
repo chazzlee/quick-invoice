@@ -21,7 +21,7 @@ export default function Preview() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="container pt-8 mx-auto">
+      <main className="container px-16 pt-8 mx-auto">
         <div className="mb-4">
           <Link className="btn" href="/">
             Go back

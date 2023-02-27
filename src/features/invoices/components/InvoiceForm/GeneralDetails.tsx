@@ -31,6 +31,7 @@ export function GeneralDetails({ title }: GeneralDetailsProps) {
         >
           <TextInput
             type={field.type}
+            classes={`${errors?.[title]?.[field.name] ? "input-error" : ""}`}
             {...register(`${title}.${field.name}`, {
               required: {
                 value: field.required,

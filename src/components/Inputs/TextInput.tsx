@@ -4,6 +4,7 @@ import {
   forwardRef,
 } from "react";
 
+// TODO: inputSize doesn't work
 type TextInputProps = ComponentPropsWithRef<"input"> & {
   id?: string;
   type?: HTMLInputTypeAttribute;

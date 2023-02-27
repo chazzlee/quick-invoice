@@ -49,6 +49,7 @@ export function AddressDetails({ id }: AddressDetailsProps) {
         error={errors[id]?.address?.street?.message}
       >
         <TextInput
+          classes={`${errors[id]?.address?.street ? "input-error" : ""}`}
           {...register(`${id}.address.street`, {
             required: { value: true, message: "street is required" },
           })}
@@ -60,6 +61,7 @@ export function AddressDetails({ id }: AddressDetailsProps) {
         error={errors[id]?.address?.city?.message}
       >
         <TextInput
+          classes={`${errors[id]?.address?.city ? "input-error" : ""}`}
           {...register(`${id}.address.city`, {
             required: { value: true, message: "city is required" },
           })}
@@ -74,6 +76,7 @@ export function AddressDetails({ id }: AddressDetailsProps) {
           <SelectInput
             selectOptions={selectStates}
             defaultLabel="Choose state"
+            classes={`${errors[id]?.address?.state ? "select-error" : ""}`}
             {...register(`${id}.address.state`, {
               required: { value: true, message: "state is required" },
             })}
@@ -86,6 +89,7 @@ export function AddressDetails({ id }: AddressDetailsProps) {
         >
           <TextInput
             width="w-1/2"
+            classes={`${errors[id]?.address?.zipCode ? "input-error" : ""}`}
             {...register(`${id}.address.zipCode`, {
               required: { value: true, message: "zip code is required" },
               minLength: { value: 5, message: "zip code must be 5 digits" },

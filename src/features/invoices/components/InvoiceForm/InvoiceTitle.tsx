@@ -17,7 +17,7 @@ export function InvoiceTitle() {
             message: "Invoice title cannot exceed 50 characters",
           },
         })}
-        classes="text-xl font-semibold"
+        classes={`text-xl font-semibold ${errors.title ? "input-error" : ""}`}
       />
     </FormControl>
   );
