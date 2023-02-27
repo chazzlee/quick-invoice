@@ -8,9 +8,7 @@ export function useInvoiceWatchOne<K extends FieldPath<InvoiceFormData>>(
   return useWatch<InvoiceFormData, K>({ name });
 }
 
-function useInvoiceWatch() {
-  return useWatch<InvoiceFormData>();
-}
+const useInvoiceWatch = useWatch<InvoiceFormData>;
 
 export function useInvoiceFormValues() {
   const { getValues } = useInvoiceFormContext();

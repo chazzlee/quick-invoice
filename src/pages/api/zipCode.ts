@@ -2,16 +2,16 @@ import { isKeyOf } from "@/utils/isKey";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { setTimeout } from "timers/promises";
 
-type LocationData = {
+type Location = {
   city: string;
   state: string;
 };
 
-type ZipCodeData = {
+type ZipCode = {
   zipCode: string;
 };
 
-type ResponseData = LocationData | ZipCodeData;
+type ResponseData = Location | ZipCode;
 
 const SAMPLE_ZIPCODES = {
   NY: { city: "New York", zipCode: "10025" },
@@ -36,7 +36,7 @@ const SAMPLE_CITY_AND_STATES = {
 async function fetchZipCodeFromCityAndState(
   city: string,
   state: string
-): Promise<ZipCodeData> {
+): Promise<ZipCode> {
   // const response = await fetch(
   //   `https://www.zipcodeapi.com/rest/${process.env.ZIP_API_KEY}/city-zips.json/${city}/${state}`,
   //   { headers: { Accept: "application/json" } }
@@ -48,7 +48,7 @@ async function fetchZipCodeFromCityAndState(
       isKeyOf(SAMPLE_ZIPCODES, state) &&
       SAMPLE_ZIPCODES[state].city.toLowerCase() === city.toLowerCase()
     ) {
-      const result: ZipCodeData = { zipCode: SAMPLE_ZIPCODES[state].zipCode };
+      const result: ZipCode = { zipCode: SAMPLE_ZIPCODES[state].zipCode };
       return await setTimeout(500, result);
     }
     return await setTimeout(500, { zipCode: "" });
@@ -59,8 +59,7 @@ async function fetchZipCodeFromCityAndState(
 
 async function fetchCityAndStateFromZipCode(
   zipCode: string
-): Promise<LocationData> {
-  const ZIPCODE_LENGTH = 5;
+): Promise<Location> {
   // const response = await fetch(
   //   `https://www.zipcodeapi.com/rest/${process.env.ZIP_API_KEY}/info.json/${zipCode}/radians`,
   //   { headers: { Accept: "application/json" } }
@@ -69,7 +68,7 @@ async function fetchCityAndStateFromZipCode(
   // return { city: data.city, state: data.state };
   try {
     if (isKeyOf(SAMPLE_CITY_AND_STATES, zipCode)) {
-      const result: LocationData = {
+      const result: Location = {
         city: SAMPLE_CITY_AND_STATES[zipCode].city,
         state: SAMPLE_CITY_AND_STATES[zipCode].state,
       };
@@ -82,6 +81,7 @@ async function fetchCityAndStateFromZipCode(
   }
 }
 
+// TODO:/FIXME:
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData | { error: string }>
