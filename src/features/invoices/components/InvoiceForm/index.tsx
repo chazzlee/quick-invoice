@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { InvoiceTitle } from "./InvoiceTitle";
 import { CompanyLogo } from "./CompanyLogo";
 import { GeneralDetails } from "./GeneralDetails";
@@ -7,15 +8,23 @@ import { LineItems } from "./LineItems";
 import { BalanceDetails } from "./BalanceDetails";
 import { ExtraNotes } from "./ExtraNotes";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
+import { useRouter } from "next/router";
 
 const FROM = "from";
 const TO = "to";
 
 export function InvoiceForm() {
   const { handleSubmit } = useInvoiceFormContext();
+  const router = useRouter();
 
   return (
-    <form className="px-8" onSubmit={handleSubmit((data) => console.log(data))}>
+    <form
+      className="px-8"
+      onSubmit={handleSubmit((data) => {
+        window?.sessionStorage.setItem("invoice", JSON.stringify(data));
+        router.push("/preview");
+      })}
+    >
       <div className="grid grid-cols-2 gap-8">
         <>
           <InvoiceTitle />
