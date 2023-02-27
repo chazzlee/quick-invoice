@@ -19,7 +19,6 @@ export function InvoiceForm() {
 
   return (
     <form
-      className="px-8"
       onSubmit={handleSubmit((data) => {
         window?.sessionStorage.setItem("invoice", JSON.stringify(data));
         router.push("/preview");

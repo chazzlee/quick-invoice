@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Preview() {
@@ -11,11 +12,18 @@ export default function Preview() {
   }, []);
 
   return (
-    <div>
-      <h1>PREVIEW</h1>
-      <div>
-        <pre>{JSON.stringify(form, null, 2)}</pre>
-      </div>
-    </div>
+    <main className="container mx-auto">
+      <section className="grid grid-cols-[3fr_1fr] pt-16 gap-8">
+        <article className="px-8 py-8 mb-20 bg-white border-t-4 border-b-4 border-gray-600">
+          <pre>{JSON.stringify(form, null, 2)}</pre>
+        </article>
+        <aside>
+          <Link className="btn" href="/">
+            Go back
+          </Link>
+          <button className="btn">Generate PDF</button>
+        </aside>
+      </section>
+    </main>
   );
 }

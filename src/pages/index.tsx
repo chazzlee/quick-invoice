@@ -5,9 +5,17 @@ import { InvoiceAside } from "@/features/invoices/components/InvoiceAside";
 import { FormProvider, useForm } from "react-hook-form";
 import { defaultInvoice } from "@/features/invoices/defaults";
 import type { InvoiceFormData } from "@/features/invoices/types";
+import { useEffect } from "react";
 
 export default function Home() {
   const methods = useForm<InvoiceFormData>({ defaultValues: defaultInvoice });
+
+  useEffect(() => {
+    const invoice = window?.sessionStorage.getItem("invoice");
+    if (invoice) {
+      methods.reset(JSON.parse(invoice));
+    }
+  }, [methods]);
 
   return (
     <>
@@ -18,9 +26,21 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="container mx-auto">
+        <div>
+          <button
+            type="button"
+            className="btn"
+            onClick={() => {
+              window?.sessionStorage.removeItem("invoice");
+              methods.reset(defaultInvoice);
+            }}
+          >
+            Reset
+          </button>
+        </div>
         <FormProvider {...methods}>
           <section className="grid grid-cols-[3fr_1fr] pt-16 gap-8">
-            <article className="py-8 mb-20 bg-white border-t-4 border-b-4 border-gray-600">
+            <article className="px-8 py-8 mb-20 bg-white border-t-4 border-b-4 border-gray-600">
               <InvoiceForm />
             </article>
 
