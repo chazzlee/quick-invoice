@@ -5,10 +5,17 @@ type GeneralDetailsProps = {
   title: "from" | "to";
 };
 
-const generalFields = ["name", "email", "phone"] as const;
+const generalFields = [
+  { name: "name", type: "text", required: true },
+  { name: "email", type: "email", required: true },
+  { name: "phone", type: "tel", required: true },
+] as const;
 
 export function GeneralDetails({ title }: GeneralDetailsProps) {
-  const { register } = useInvoiceFormContext();
+  const {
+    register,
+    formState: { errors },
+  } = useInvoiceFormContext();
 
   return (
     <div className="general-details">
@@ -17,11 +24,20 @@ export function GeneralDetails({ title }: GeneralDetailsProps) {
       </h3>
       {generalFields.map((field) => (
         <FormControl
-          key={`${title}-${field}`}
-          id={`${title}-${field}`}
-          label={field}
+          key={`${title}-${field.name}`}
+          id={`${title}-${field.name}`}
+          label={field.name}
+          error={errors?.[title]?.[field.name]?.message}
         >
-          <TextInput {...register(`${title}.${field}`)} />
+          <TextInput
+            type={field.type}
+            {...register(`${title}.${field.name}`, {
+              required: {
+                value: field.required,
+                message: `${field.name} is required`,
+              },
+            })}
+          />
         </FormControl>
       ))}
     </div>

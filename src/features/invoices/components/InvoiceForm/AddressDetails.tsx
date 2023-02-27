@@ -9,7 +9,11 @@ type AddressDetailsProps = { id: "from" | "to" };
 
 // TODO: debounce, rethink trigger logic
 export function AddressDetails({ id }: AddressDetailsProps) {
-  const { register, setValue, getValues } = useInvoiceFormContext();
+  const {
+    register,
+    setValue,
+    formState: { errors },
+  } = useInvoiceFormContext();
 
   const city = useInvoiceWatchOne(`${id}.address.city`);
   const state = useInvoiceWatchOne(`${id}.address.state`);
@@ -39,33 +43,53 @@ export function AddressDetails({ id }: AddressDetailsProps) {
   return (
     <div className="address">
       <h3 className="font-semibold capitalize">Address</h3>
-      <FormControl id={`${id}-street`} label="Street">
-        <TextInput {...register(`${id}.address.street`)} />
+      <FormControl
+        id={`${id}-street`}
+        label="Street"
+        error={errors[id]?.address?.street?.message}
+      >
+        <TextInput
+          {...register(`${id}.address.street`, {
+            required: { value: true, message: "street is required" },
+          })}
+        />
       </FormControl>
-      <FormControl id={`${id}-city`} label="City">
+      <FormControl
+        id={`${id}-city`}
+        label="City"
+        error={errors[id]?.address?.city?.message}
+      >
         <TextInput
           {...register(`${id}.address.city`, {
-            onChange(event: ChangeEvent<HTMLInputElement>) {},
+            required: { value: true, message: "city is required" },
           })}
         />
       </FormControl>
       <div className="flex">
-        <FormControl id={`${id}-state`} label="State">
+        <FormControl
+          id={`${id}-state`}
+          label="State"
+          error={errors[id]?.address?.state?.message}
+        >
           <SelectInput
             selectOptions={selectStates}
             defaultLabel="Choose state"
             {...register(`${id}.address.state`, {
-              onChange(event: ChangeEvent<HTMLSelectElement>) {
-                console.log(event.target.value);
-              },
+              required: { value: true, message: "state is required" },
             })}
           />
         </FormControl>
-        <FormControl id={`${id}-zipCode`} label="Zip code">
+        <FormControl
+          id={`${id}-zipCode`}
+          label="Zip code"
+          error={errors[id]?.address?.zipCode?.message}
+        >
           <TextInput
             width="w-1/2"
             {...register(`${id}.address.zipCode`, {
-              onChange(event: ChangeEvent<HTMLInputElement>) {},
+              required: { value: true, message: "zip code is required" },
+              minLength: { value: 5, message: "zip code must be 5 digits" },
+              maxLength: { value: 5, message: "zip code must be 5 digits" },
             })}
           />
         </FormControl>

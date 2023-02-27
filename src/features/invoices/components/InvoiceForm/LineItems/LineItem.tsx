@@ -13,7 +13,11 @@ type LineItemProps = {
 };
 
 export function LineItem({ index, onRemove }: LineItemProps) {
-  const { register, setValue } = useInvoiceFormContext();
+  const {
+    register,
+    setValue,
+    formState: { errors },
+  } = useInvoiceFormContext();
   const { lineItems } = useInvoiceFormValues();
 
   const { isTaxable, updateTotalTax } = useTax();
@@ -56,7 +60,9 @@ export function LineItem({ index, onRemove }: LineItemProps) {
         <button
           type="button"
           className="btn btn-sm"
-          onClick={() => onRemove(index)}
+          onClick={() => {
+            onRemove(index);
+          }}
         >
           &times;
         </button>
@@ -66,8 +72,17 @@ export function LineItem({ index, onRemove }: LineItemProps) {
           id={`description-${index}`}
           placeholder="Item description"
           inputSize="sm"
-          {...register(`lineItems.${index}.description`)}
+          {...register(`lineItems.${index}.description`, {
+            required: { value: true, message: "item description is required" },
+          })}
         />
+        {errors.lineItems?.[index]?.description?.message ? (
+          <label className="label">
+            <span className="text-red-500 label-text-alt">
+              {errors.lineItems?.[index]?.description?.message}
+            </span>
+          </label>
+        ) : null}
         <Textarea
           id={`details-${index}`}
           placeholder="Additional details"

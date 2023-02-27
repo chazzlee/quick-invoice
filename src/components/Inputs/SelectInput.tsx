@@ -15,6 +15,7 @@ export const SelectInput = forwardRef<HTMLSelectElement, SelectInputProps>(
         ref={ref}
         className="w-1/2 select select-bordered select-md"
         {...rest}
+        defaultValue="default"
       >
         {defaultLabel ? (
           <option key="default-select" value="default" disabled>

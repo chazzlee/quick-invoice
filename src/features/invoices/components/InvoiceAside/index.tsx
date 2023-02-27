@@ -9,7 +9,11 @@ import { useInvoiceFieldArray } from "../../hooks/useInvoiceFieldArray";
 import { useInvoiceFormValues } from "../../hooks/useInvoiceFormValues";
 
 export function InvoiceAside() {
-  const { register, setValue } = useInvoiceFormContext();
+  const {
+    register,
+    setValue,
+    formState: { errors },
+  } = useInvoiceFormContext();
   const { lineItems } = useInvoiceFormValues();
   const { replace } = useInvoiceFieldArray();
   const { taxRate, isTaxable, updateTotalTax } = useTax();
@@ -52,12 +56,23 @@ export function InvoiceAside() {
             />
           </FormControl>
           {isTaxable ? (
-            <FormControl id="tax-rate" label="Rate">
+            <FormControl
+              id="tax-rate"
+              label="Rate"
+              error={errors.tax?.rate?.message}
+            >
               <TextInput
                 type="number"
                 min={0}
                 width="w-1/2"
-                {...register("tax.rate", { valueAsNumber: true })}
+                {...register("tax.rate", {
+                  valueAsNumber: true,
+                  required: {
+                    value: isTaxable,
+                    message: "tax rate is required",
+                  },
+                  min: { value: 1, message: "tax rate must be greater than 0" },
+                })}
               />
             </FormControl>
           ) : null}
@@ -80,20 +95,40 @@ export function InvoiceAside() {
           </FormControl>
 
           {isPercentageDiscount && (
-            <FormControl id="percent" label="Percent">
+            <FormControl
+              id="percent"
+              label="Percent"
+              error={errors.discount?.rate?.message}
+            >
               <TextInput
                 width="w-1/2"
                 type="number"
-                {...register("discount.rate", { valueAsNumber: true })}
+                {...register("discount.rate", {
+                  required: {
+                    value: isPercentageDiscount,
+                    message: "discount percentage is required",
+                  },
+                  valueAsNumber: true,
+                })}
               />
             </FormControl>
           )}
           {isFlatDiscount && (
-            <FormControl id="flat-amount" label="Amount">
+            <FormControl
+              id="flat-amount"
+              label="Amount"
+              error={errors.discount?.rate?.message}
+            >
               <TextInput
                 width="w-1/2"
                 type="number"
-                {...register("discount.rate", { valueAsNumber: true })}
+                {...register("discount.rate", {
+                  required: {
+                    value: isFlatDiscount,
+                    message: "discount amount is required",
+                  },
+                  valueAsNumber: true,
+                })}
               />
             </FormControl>
           )}
