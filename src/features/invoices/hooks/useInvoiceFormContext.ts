@@ -1,6 +1,7 @@
+import { InvoiceFormSchema } from "@/schemas";
 import { useFormContext } from "react-hook-form";
-import type { InvoiceFormData } from "../types";
+// import type { InvoiceFormData } from "../types";
 
 export function useInvoiceFormContext() {
-  return useFormContext<InvoiceFormData>();
+  return useFormContext<InvoiceFormSchema>();
 }

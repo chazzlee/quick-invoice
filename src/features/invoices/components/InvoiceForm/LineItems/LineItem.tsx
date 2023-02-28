@@ -71,10 +71,10 @@ export function LineItem({ index, onRemove }: LineItemProps) {
         <TextInput
           id={`description-${index}`}
           placeholder="Item description"
-          inputSize="sm"
-          {...register(`lineItems.${index}.description`, {
-            required: { value: true, message: "item description is required" },
-          })}
+          classes={`${
+            errors.lineItems?.[index]?.description ? "input-error" : ""
+          }`}
+          {...register(`lineItems.${index}.description`)}
         />
         {errors.lineItems?.[index]?.description?.message ? (
           <label className="label">

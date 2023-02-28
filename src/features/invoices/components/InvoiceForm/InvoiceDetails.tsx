@@ -5,12 +5,13 @@ import { selectTerms } from "../../selectOptions";
 import type { TermsType } from "../../types";
 import { addDays, formatISO, startOfToday } from "date-fns";
 
-const getDueDate = (termsType: TermsType): string => {
+// TODO: include day of?
+const getDueDate = (termsType: TermsType, start: Date) => {
   if (termsType === "custom") {
-    return formatISO(startOfToday(), { representation: "date" });
+    return formatISO(start, { representation: "date" });
   }
   const daysToAdd = parseInt(termsType, 10);
-  return formatISO(addDays(startOfToday(), daysToAdd), {
+  return formatISO(addDays(start, daysToAdd), {
     representation: "date",
   });
 };
@@ -19,11 +20,11 @@ export function InvoiceDetails() {
   const {
     register,
     setValue,
-    trigger,
     formState: { errors },
   } = useInvoiceFormContext();
 
   const termsType = useInvoiceWatchOne("invoice.terms.kind");
+  const date = useInvoiceWatchOne("invoice.date");
   const hasDueDate = termsType !== "0_days";
 
   return (
@@ -36,9 +37,7 @@ export function InvoiceDetails() {
         <TextInput
           width="w-1/2"
           classes={`${errors.invoice?.number ? "input-error" : ""}`}
-          {...register("invoice.number", {
-            required: { value: true, message: "invoice number is required" },
-          })}
+          {...register("invoice.number")}
         />
       </FormControl>
       <FormControl
@@ -51,7 +50,15 @@ export function InvoiceDetails() {
           width="w-1/2"
           classes={`${errors.invoice?.date ? "input-error" : ""}`}
           {...register("invoice.date", {
-            required: { value: true, message: "invoice date is required" },
+            valueAsDate: false,
+            onChange(event) {
+              if (hasDueDate) {
+                setValue(
+                  "invoice.terms.dueDate",
+                  getDueDate(termsType, new Date(event.target.value))
+                );
+              }
+            },
           })}
         />
       </FormControl>
@@ -63,10 +70,11 @@ export function InvoiceDetails() {
           {...register("invoice.terms.kind", {
             onChange(event) {
               const termsType = event.target.value as TermsType;
-              setValue("invoice.terms.dueDate", getDueDate(termsType));
-              if (hasDueDate) {
-                trigger("invoice.terms.dueDate");
-              }
+              // TODO: FIXME:
+              setValue(
+                "invoice.terms.dueDate",
+                getDueDate(termsType, new Date(date))
+              );
             },
           })}
         />
@@ -81,9 +89,7 @@ export function InvoiceDetails() {
             type="date"
             classes={`${errors.invoice?.terms?.dueDate ? "input-error" : ""}`}
             width="w-1/2"
-            {...register("invoice.terms.dueDate", {
-              required: { value: hasDueDate, message: "Due date is required" },
-            })}
+            {...register("invoice.terms.dueDate", { valueAsDate: false })}
           />
         </FormControl>
       ) : null}

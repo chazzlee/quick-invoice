@@ -50,9 +50,7 @@ export function AddressDetails({ id }: AddressDetailsProps) {
       >
         <TextInput
           classes={`${errors[id]?.address?.street ? "input-error" : ""}`}
-          {...register(`${id}.address.street`, {
-            required: { value: true, message: "street is required" },
-          })}
+          {...register(`${id}.address.street`)}
         />
       </FormControl>
       <FormControl
@@ -62,9 +60,7 @@ export function AddressDetails({ id }: AddressDetailsProps) {
       >
         <TextInput
           classes={`${errors[id]?.address?.city ? "input-error" : ""}`}
-          {...register(`${id}.address.city`, {
-            required: { value: true, message: "city is required" },
-          })}
+          {...register(`${id}.address.city`)}
         />
       </FormControl>
       <div className="flex">
@@ -77,9 +73,7 @@ export function AddressDetails({ id }: AddressDetailsProps) {
             selectOptions={selectStates}
             defaultLabel="Choose state"
             classes={`${errors[id]?.address?.state ? "select-error" : ""}`}
-            {...register(`${id}.address.state`, {
-              required: { value: true, message: "state is required" },
-            })}
+            {...register(`${id}.address.state`)}
           />
         </FormControl>
         <FormControl
@@ -90,11 +84,7 @@ export function AddressDetails({ id }: AddressDetailsProps) {
           <TextInput
             width="w-1/2"
             classes={`${errors[id]?.address?.zipCode ? "input-error" : ""}`}
-            {...register(`${id}.address.zipCode`, {
-              required: { value: true, message: "zip code is required" },
-              minLength: { value: 5, message: "zip code must be 5 digits" },
-              maxLength: { value: 5, message: "zip code must be 5 digits" },
-            })}
+            {...register(`${id}.address.zipCode`)}
           />
         </FormControl>
       </div>

@@ -10,13 +10,7 @@ export function InvoiceTitle() {
   return (
     <FormControl id="title" label="Invoice title" error={errors.title?.message}>
       <TextInput
-        {...register("title", {
-          required: { value: true, message: "Invoice title is required" },
-          maxLength: {
-            value: 50,
-            message: "Invoice title cannot exceed 50 characters",
-          },
-        })}
+        {...register("title")}
         classes={`text-xl font-semibold ${errors.title ? "input-error" : ""}`}
       />
     </FormControl>

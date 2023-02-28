@@ -14,11 +14,22 @@ const FROM = "from";
 const TO = "to";
 
 export function InvoiceForm() {
-  const { handleSubmit } = useInvoiceFormContext();
+  const {
+    handleSubmit,
+    getValues,
+    formState: { isValid, errors },
+  } = useInvoiceFormContext();
   const router = useRouter();
 
+  console.log("error", errors);
+  console.log("form", getValues());
+
   return (
-    <form onSubmit={handleSubmit((data) => console.log(data))}>
+    <form
+      onSubmit={handleSubmit((data) => {
+        router.push("/preview");
+      })}
+    >
       <div className="grid grid-cols-2 gap-8">
         <>
           <InvoiceTitle />
@@ -45,9 +56,9 @@ export function InvoiceForm() {
       <ExtraNotes />
 
       <div className="py-8">
-        <Link className="btn" href="/preview">
+        <button className="btn" type="submit">
           Preview PDF
-        </Link>
+        </button>
       </div>
     </form>
   );

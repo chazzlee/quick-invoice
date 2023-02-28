@@ -1,6 +1,7 @@
+import { InvoiceFormSchema } from "@/schemas";
 import { useFieldArray } from "react-hook-form";
-import type { InvoiceFormData } from "../types";
+// import type { InvoiceFormData } from "../types";
 
 export function useInvoiceFieldArray() {
-  return useFieldArray<InvoiceFormData>({ name: "lineItems" });
+  return useFieldArray<InvoiceFormSchema>({ name: "lineItems" });
 }
