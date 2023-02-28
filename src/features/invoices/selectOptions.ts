@@ -1,3 +1,4 @@
+//TODO: make generic
 export type SelectOption = {
   label: string;
   value: string;

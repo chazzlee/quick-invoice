@@ -1,6 +1,5 @@
 import { FormControl, SelectInput, TextInput } from "@/components/Inputs";
-import { ChangeEvent, useEffect } from "react";
-import { useWatch } from "react-hook-form";
+import { useEffect } from "react";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
 import { useInvoiceWatchOne } from "../../hooks/useInvoiceFormValues";
 import { selectStates } from "../../selectOptions";
@@ -21,18 +20,18 @@ export function AddressDetails({ id }: AddressDetailsProps) {
 
   useEffect(() => {
     if (zipCode.length === 5 && (city.length === 0 || state.length === 0)) {
-      fetch(`/api/zipCode?zipCode=${zipCode}`)
-        .then((response) => response.json())
-        .then((data) => {
-          setValue(`${id}.address.city`, data.city);
-          setValue(`${id}.address.state`, data.state);
-        });
+      // fetch(`/api/zipCode?zipCode=${zipCode}`)
+      //   .then((response) => response.json())
+      //   .then((data) => {
+      //     setValue(`${id}.address.city`, data.city);
+      //     setValue(`${id}.address.state`, data.state);
+      //   });
     }
 
     if (city.length >= 2 && state.length === 2) {
-      fetch(`/api/zipCode?city=${city}&state=${state}`)
-        .then((response) => response.json())
-        .then((data) => setValue(`${id}.address.zipCode`, data.zipCode));
+      // fetch(`/api/zipCode?city=${city}&state=${state}`)
+      //   .then((response) => response.json())
+      //   .then((data) => setValue(`${id}.address.zipCode`, data.zipCode));
     }
 
     return () => {
