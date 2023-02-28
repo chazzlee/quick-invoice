@@ -2,8 +2,12 @@ import Head from "next/head";
 import { Inter } from "@next/font/google";
 import { InvoiceForm } from "@/features/invoices/components/InvoiceForm";
 import { InvoiceAside } from "@/features/invoices/components/InvoiceAside";
+import { useInvoiceFormContext } from "@/features/invoices/hooks/useInvoiceFormContext";
+import { defaultInvoice } from "@/features/invoices/defaults";
 
 export default function Home() {
+  const { reset } = useInvoiceFormContext();
+
   return (
     <>
       <Head>
@@ -17,11 +21,7 @@ export default function Home() {
           <button
             type="button"
             className="btn"
-            onClick={() => {
-              // window?.sessionStorage.removeItem("invoice");
-              // methods.reset(defaultInvoice);
-              console.log("reset...");
-            }}
+            onClick={() => reset(defaultInvoice)}
           >
             Reset
           </button>

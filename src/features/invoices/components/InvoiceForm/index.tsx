@@ -18,12 +18,7 @@ export function InvoiceForm() {
   const router = useRouter();
 
   return (
-    <form
-      onSubmit={handleSubmit((data) => {
-        window?.sessionStorage.setItem("invoice", JSON.stringify(data));
-        router.push("/preview");
-      })}
-    >
+    <form onSubmit={handleSubmit((data) => console.log(data))}>
       <div className="grid grid-cols-2 gap-8">
         <>
           <InvoiceTitle />
@@ -50,9 +45,9 @@ export function InvoiceForm() {
       <ExtraNotes />
 
       <div className="py-8">
-        <button type="submit" className="btn">
+        <Link className="btn" href="/preview">
           Preview PDF
-        </button>
+        </Link>
       </div>
     </form>
   );
