@@ -1,15 +1,16 @@
 import Image from "next/image";
+import { type ChangeEvent } from "react";
 import { FileInput, FormControl } from "@/components/Inputs";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
 import { useInvoiceWatchOne } from "../../hooks/useInvoiceFormValues";
-import { ChangeEvent, useEffect, useRef } from "react";
 
 export function CompanyLogo() {
   const { register, setValue } = useInvoiceFormContext();
 
   //TODO: just store image/file, not FileList
   //TODO: perserve image after preview and back
-  const companyLogo = useInvoiceWatchOne("logo");
+  const fileList = useInvoiceWatchOne("logo");
+  const companyLogo = fileList?.item?.(0);
 
   return (
     <div className="image-preview">
@@ -22,9 +23,9 @@ export function CompanyLogo() {
         />
       </FormControl>
       <div className="w-1/2 mt-8 bg-white border h-28 logo-preview">
-        {companyLogo?.item?.(0) ? (
+        {companyLogo ? (
           <Image
-            src={URL.createObjectURL(companyLogo?.item?.(0)!)}
+            src={URL.createObjectURL(companyLogo)}
             alt="Company logo"
             className="object-contain w-full h-full"
             width={80}

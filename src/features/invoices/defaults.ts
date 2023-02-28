@@ -32,16 +32,16 @@ export const defaultInvoice: InvoiceFormData = {
     date: formatISO(startOfToday(), { representation: "date" }),
     notes: "",
     terms: {
-      type: "0_days",
+      kind: "0_days",
       dueDate: "",
     },
   },
   tax: {
-    type: "no_tax",
+    kind: "no_tax",
     rate: 0,
   },
   discount: {
-    type: "no_discount",
+    kind: "no_discount",
     rate: 0,
   },
   lineItems: [{ ...defaultLineItem }],

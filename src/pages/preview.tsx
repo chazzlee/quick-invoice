@@ -1,16 +1,10 @@
 import Head from "next/head";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useInvoiceFormContext } from "@/features/invoices/hooks/useInvoiceFormContext";
 
 export default function Preview() {
-  const [form, setForm] = useState(null);
-
-  useEffect(() => {
-    const invoice = JSON.parse(window.sessionStorage.getItem("invoice") ?? "");
-    if (invoice) {
-      setForm(invoice);
-    }
-  }, []);
+  const { getValues } = useInvoiceFormContext();
+  console.log(getValues());
 
   return (
     <>
@@ -29,7 +23,13 @@ export default function Preview() {
         </div>
         <section className="grid grid-cols-[3fr_1fr] gap-8">
           <article className="px-8 py-8 mb-20 bg-white border-t-4 border-b-4 border-gray-600">
-            <pre>{JSON.stringify(form, null, 2)}</pre>
+            <img
+              src={URL.createObjectURL(getValues("logo")?.item?.(0))}
+              alt="changemelogo"
+              height={100}
+              width={100}
+            />
+            <pre>{JSON.stringify(getValues(), null, 2)}</pre>
           </article>
           <aside>
             <button className="btn">Generate PDF</button>
