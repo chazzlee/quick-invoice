@@ -4,12 +4,16 @@ import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
 import { useInvoiceWatchOne } from "../../hooks/useInvoiceFormValues";
 import { selectStates } from "../../selectOptions";
 
+import { NumericFormat, PatternFormat } from "react-number-format";
+import { Controller } from "react-hook-form";
+
 type AddressDetailsProps = { id: "from" | "to" };
 
 // TODO: debounce, rethink trigger logic
 export function AddressDetails({ id }: AddressDetailsProps) {
   const {
     register,
+    control,
     setValue,
     formState: { errors },
   } = useInvoiceFormContext();
@@ -18,26 +22,26 @@ export function AddressDetails({ id }: AddressDetailsProps) {
   const state = useInvoiceWatchOne(`${id}.address.state`);
   const zipCode = useInvoiceWatchOne(`${id}.address.zipCode`);
 
-  useEffect(() => {
-    if (zipCode.length === 5 && (city.length === 0 || state.length === 0)) {
-      // fetch(`/api/zipCode?zipCode=${zipCode}`)
-      //   .then((response) => response.json())
-      //   .then((data) => {
-      //     setValue(`${id}.address.city`, data.city);
-      //     setValue(`${id}.address.state`, data.state);
-      //   });
-    }
+  // useEffect(() => {
+  // if (zipCode.length === 5 && (city.length === 0 || state.length === 0)) {
+  // fetch(`/api/zipCode?zipCode=${zipCode}`)
+  //   .then((response) => response.json())
+  //   .then((data) => {
+  //     setValue(`${id}.address.city`, data.city);
+  //     setValue(`${id}.address.state`, data.state);
+  //   });
+  // }
 
-    if (city.length >= 2 && state.length === 2) {
-      // fetch(`/api/zipCode?city=${city}&state=${state}`)
-      //   .then((response) => response.json())
-      //   .then((data) => setValue(`${id}.address.zipCode`, data.zipCode));
-    }
+  // if (city.length >= 2 && state.length === 2) {
+  // fetch(`/api/zipCode?city=${city}&state=${state}`)
+  //   .then((response) => response.json())
+  //   .then((data) => setValue(`${id}.address.zipCode`, data.zipCode));
+  // }
 
-    return () => {
-      console.log("Unmounting");
-    };
-  }, [city, city.length, id, setValue, state, state.length, zipCode]);
+  // return () => {
+  //   console.log("Unmounting");
+  // };
+  // }, [city, city.length, id, setValue, state, state.length, zipCode]);
 
   return (
     <div className="address">
@@ -80,13 +84,33 @@ export function AddressDetails({ id }: AddressDetailsProps) {
           label="Zip code"
           error={errors[id]?.address?.zipCode?.message}
         >
-          <TextInput
-            width="w-1/2"
-            classes={`${errors[id]?.address?.zipCode ? "input-error" : ""}`}
-            {...register(`${id}.address.zipCode`)}
+          <Controller
+            control={control}
+            name={`${id}.address.zipCode`}
+            render={({
+              field: { onChange, name, value, ref },
+              fieldState: { error },
+            }) => (
+              <PatternFormat
+                className={`w-1/2 input input-bordered ${
+                  error ? "input-error" : ""
+                }`}
+                placeholder="00000"
+                format="#####"
+                getInputRef={ref}
+                name={name}
+                value={value}
+                onChange={onChange}
+                valueIsNumericString={true}
+              />
+            )}
           />
         </FormControl>
       </div>
     </div>
   );
+}
+
+{
+  /*  */
 }

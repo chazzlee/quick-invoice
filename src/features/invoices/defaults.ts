@@ -3,6 +3,10 @@ import {
   GeneralDetailsSchema,
   InvoiceFormSchema,
   LineItemSchema,
+  NO_DISCOUNT_FLAT,
+  NO_DISCOUNT_RATE,
+  NO_LINE_ITEM_RATE,
+  NO_TAX_RATE,
 } from "@/schemas";
 
 export const defaultGeneralDetails: GeneralDetailsSchema = {
@@ -20,7 +24,7 @@ export const defaultGeneralDetails: GeneralDetailsSchema = {
 export const defaultLineItem: LineItemSchema = {
   description: "",
   details: "",
-  rate: 0,
+  rate: NO_LINE_ITEM_RATE,
   quantity: 1,
   amount: 0,
   taxable: false,
@@ -42,13 +46,13 @@ export const defaultInvoice: InvoiceFormSchema = {
   },
   tax: {
     kind: "no_tax",
-    rate: 0,
+    rate: NO_TAX_RATE,
   },
   discount: {
     kind: "no_discount",
-    rate: 0,
+    rate: NO_DISCOUNT_FLAT,
   },
-  lineItems: [{ ...defaultLineItem }],
+  lineItems: [defaultLineItem],
   balance: {
     subtotal: 0,
     total: 0,

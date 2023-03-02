@@ -1,3 +1,4 @@
+import { convertPercentageToFloat } from "@/utils/convertPercentageToFloat";
 import { useCallback } from "react";
 import { useInvoiceFormContext } from "./useInvoiceFormContext";
 import { useInvoiceFormValues } from "./useInvoiceFormValues";
@@ -16,9 +17,10 @@ export function useDiscount() {
 
   const updateTotalDiscount = useCallback(() => {
     if (discountType === "flat_amount") {
+      // TODO: NaN
       setValue("balance.totalDiscount", discountRate);
     } else if (discountType === "percent") {
-      const discountPercentage = discountRate / 100;
+      const discountPercentage = convertPercentageToFloat(discountRate);
       const totalDiscount = subtotal * discountPercentage;
       setValue("balance.totalDiscount", totalDiscount);
     } else {

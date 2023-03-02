@@ -2,10 +2,12 @@ import { useEffect } from "react";
 import { Textarea, TextInput } from "@/components/Inputs";
 import { useInvoiceFormValues } from "@/features/invoices/hooks/useInvoiceFormValues";
 import { useInvoiceFormContext } from "@/features/invoices/hooks/useInvoiceFormContext";
-import type { LineItem } from "@/features/invoices/types";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { useTax } from "@/features/invoices/hooks/useTax";
 import { useDiscount } from "@/features/invoices/hooks/useDiscount";
+import { NumericFormat } from "react-number-format";
+import { Controller } from "react-hook-form";
+import { NO_LINE_ITEM_RATE } from "@/schemas";
 
 type LineItemProps = {
   readonly index: number;
@@ -15,6 +17,7 @@ type LineItemProps = {
 export function LineItem({ index, onRemove }: LineItemProps) {
   const {
     register,
+    control,
     setValue,
     formState: { errors },
   } = useInvoiceFormContext();
@@ -23,17 +26,12 @@ export function LineItem({ index, onRemove }: LineItemProps) {
   const { isTaxable, updateTotalTax } = useTax();
   const { updateTotalDiscount } = useDiscount();
 
-  const lineItem = lineItems[index];
-  let rate = lineItem.rate;
-  if (Number.isNaN(rate)) {
-    rate = 0;
-  }
-  const quantity = lineItem.quantity;
-  const amount = lineItem.amount;
+  const { rate, quantity, amount } = lineItems[index];
 
+  // TODO: use money lib
   useEffect(() => {
-    function updateAmount(rate: number, quantity: number) {
-      let amount = rate * quantity;
+    function updateAmount(rate: string, quantity: number) {
+      let amount = parseFloat(rate) * quantity;
       setValue(`lineItems.${index}.amount`, amount);
     }
     function updateSubtotal() {
@@ -89,13 +87,28 @@ export function LineItem({ index, onRemove }: LineItemProps) {
           {...register(`lineItems.${index}.details`)}
         />
       </div>
-      <TextInput
-        id={`rate-${index}`}
-        type="number"
-        min={0}
-        inputSize="sm"
-        width="w-2/12"
-        {...register(`lineItems.${index}.rate`, { valueAsNumber: true })}
+
+      <Controller
+        control={control}
+        name={`lineItems.${index}.rate`}
+        render={({ field: { name, ref, onChange, value } }) => (
+          <NumericFormat
+            id={`rate-${index}`}
+            getInputRef={ref}
+            name={name}
+            value={value}
+            onValueChange={(values) => onChange(values.formattedValue)}
+            onBlur={(e) => {
+              if (!e.target.value) {
+                setValue(`lineItems.${index}.rate`, NO_LINE_ITEM_RATE);
+              }
+            }}
+            className="w-2/12 input input-bordered"
+            decimalScale={2}
+            placeholder={NO_LINE_ITEM_RATE}
+            allowNegative={false}
+          />
+        )}
       />
       <TextInput
         id={`quantity-${index}`}

@@ -1,6 +1,12 @@
 import { TERMS_TYPE } from "@/features/invoices/types";
 import { z } from "zod";
 
+export const NO_TAX_RATE = "0.000%" as const;
+export const NO_DISCOUNT_RATE = "0.00%" as const;
+export const NO_DISCOUNT_FLAT = "0.00" as const;
+export const NO_LINE_ITEM_RATE = "00.00" as const;
+
+//TODO: set  defaults for num inputs
 export const generalDetailsSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
   email: z
@@ -25,13 +31,17 @@ export const generalDetailsSchema = z.object({
   }),
 });
 
+//TODO:
 const lineItemSchema = z.object({
   description: z.string().min(1, { message: "Item description is required" }),
   details: z.string(),
-  rate: z.number(),
-  quantity: z.number(),
-  amount: z.number(),
-  taxable: z.boolean(),
+  rate: z
+    .string()
+    .regex(/^[-+]?[0-9]+[.]?[0-9]*([eE][-+]?[0-9]+)?$/)
+    .default(NO_LINE_ITEM_RATE),
+  quantity: z.number().default(1),
+  amount: z.number().default(0),
+  taxable: z.boolean().default(false),
 });
 
 export const invoiceFormSchema = z.object({
@@ -56,20 +66,30 @@ export const invoiceFormSchema = z.object({
     balanceDue: z.number(),
   }),
   tax: z.discriminatedUnion("kind", [
-    z.object({ kind: z.literal("no_tax"), rate: z.number().min(0).max(0) }),
+    z.object({
+      kind: z.literal("no_tax"),
+      rate: z.literal(NO_TAX_RATE).default(NO_TAX_RATE),
+    }),
     z.object({
       kind: z.enum(["on_total", "per_item", "deducted"]),
-      rate: z.number().gt(0, { message: "Tax rate must be greater than 0" }),
+      rate: z.string().endsWith("%").default(NO_TAX_RATE),
     }),
   ]),
   discount: z.discriminatedUnion("kind", [
     z.object({
       kind: z.literal("no_discount"),
-      rate: z.number().min(0).max(0),
+      rate: z.literal(NO_DISCOUNT_FLAT).default(NO_DISCOUNT_FLAT),
     }),
     z.object({
-      kind: z.enum(["percent", "flat_amount"]),
-      rate: z.number().gt(0, { message: "Discount must be greater than 0" }),
+      kind: z.literal("flat_amount"),
+      rate: z
+        .string()
+        .regex(/^[-+]?[0-9]+[.]?[0-9]*([eE][-+]?[0-9]+)?$/)
+        .default(NO_DISCOUNT_FLAT),
+    }),
+    z.object({
+      kind: z.literal("percent"),
+      rate: z.string().endsWith("%").default(NO_DISCOUNT_RATE),
     }),
   ]),
   lineItems: z.array(lineItemSchema),

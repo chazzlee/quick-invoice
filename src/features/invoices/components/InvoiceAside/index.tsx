@@ -1,4 +1,5 @@
 import { type ChangeEvent } from "react";
+import { Controller } from "react-hook-form";
 import { selectDiscountTypes, selectTaxTypes } from "../../selectOptions";
 import { FormControl, SelectInput, TextInput } from "@/components/Inputs";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
@@ -7,18 +8,25 @@ import { useDiscount } from "../../hooks/useDiscount";
 import type { DiscountType, TaxType } from "../../types";
 import { useInvoiceFieldArray } from "../../hooks/useInvoiceFieldArray";
 import { useInvoiceFormValues } from "../../hooks/useInvoiceFormValues";
+import { NumericFormat, PatternFormat } from "react-number-format";
+import { NO_DISCOUNT_FLAT, NO_DISCOUNT_RATE, NO_TAX_RATE } from "@/schemas";
 
 export function InvoiceAside() {
   const {
     register,
     setValue,
+    control,
+    getValues,
+    resetField,
     formState: { errors },
   } = useInvoiceFormContext();
+  const taxRateInput = register("tax.rate");
+
   const { lineItems } = useInvoiceFormValues();
   const { replace } = useInvoiceFieldArray();
   const { taxRate, isTaxable, updateTotalTax } = useTax();
 
-  const { isFlatDiscount, isPercentageDiscount } = useDiscount();
+  const { isFlatDiscount, isPercentageDiscount, discountRate } = useDiscount();
 
   return (
     <aside>
@@ -37,19 +45,20 @@ export function InvoiceAside() {
               {...register("tax.kind", {
                 onChange(event: ChangeEvent<HTMLSelectElement>) {
                   const taxType = event.target.value as TaxType;
-                  if (taxType !== "no_tax") {
-                    replace(
-                      lineItems.map((item) => ({ ...item, taxable: true }))
-                    );
-                    if (taxRate > 0) {
-                      updateTotalTax();
-                    }
-                  } else {
+                  if (taxType === "no_tax") {
                     replace(
                       lineItems.map((item) => ({ ...item, taxable: false }))
                     );
-                    setValue("tax.rate", 0);
+                    setValue("tax.rate", "0.000%");
                     setValue("balance.totalTax", 0);
+                  } else {
+                    replace(
+                      lineItems.map((item) => ({ ...item, taxable: true }))
+                    );
+
+                    if (parseFloat(taxRate) > 0) {
+                      updateTotalTax();
+                    }
                   }
                 },
               })}
@@ -61,19 +70,32 @@ export function InvoiceAside() {
               label="Rate"
               error={errors.tax?.rate?.message}
             >
-              <TextInput
-                type="number"
-                min={0}
-                width="w-1/2"
-                classes={`${errors.tax?.rate ? "input-error" : ""}`}
-                {...register("tax.rate", {
-                  valueAsNumber: true,
-                  required: {
-                    value: isTaxable,
-                    message: "tax rate is required",
-                  },
-                  min: { value: 1, message: "tax rate must be greater than 0" },
-                })}
+              <Controller
+                control={control}
+                name="tax.rate"
+                render={({
+                  field: { onChange, name, value, ref },
+                  fieldState: { error },
+                }) => (
+                  <NumericFormat
+                    className={`input input-bordered w-1/2 ${
+                      error ? "input-error" : ""
+                    }`}
+                    defaultValue={NO_TAX_RATE}
+                    suffix={"%"}
+                    decimalScale={3}
+                    getInputRef={ref}
+                    name={name}
+                    value={value}
+                    placeholder={NO_TAX_RATE}
+                    onValueChange={(values) => onChange(values.formattedValue)}
+                    onBlur={() => {
+                      if (!taxRate) {
+                        setValue("tax.rate", NO_TAX_RATE);
+                      }
+                    }}
+                  />
+                )}
               />
             </FormControl>
           ) : null}
@@ -87,9 +109,7 @@ export function InvoiceAside() {
               selectOptions={selectDiscountTypes}
               {...register("discount.kind", {
                 onChange(event: ChangeEvent<HTMLSelectElement>) {
-                  if ((event.target.value as DiscountType) === "no_discount") {
-                    setValue("discount.rate", 0);
-                  }
+                  resetField("discount.rate");
                 },
               })}
             />
@@ -101,16 +121,32 @@ export function InvoiceAside() {
               label="Percent"
               error={errors.discount?.rate?.message}
             >
-              <TextInput
-                width="w-1/2"
-                type="number"
-                {...register("discount.rate", {
-                  required: {
-                    value: isPercentageDiscount,
-                    message: "discount percentage is required",
-                  },
-                  valueAsNumber: true,
-                })}
+              <Controller
+                control={control}
+                name="discount.rate"
+                render={({
+                  field: { onChange, name, ref, value },
+                  fieldState: { error },
+                }) => (
+                  <NumericFormat
+                    className={`input input-bordered w-1/2 ${
+                      error ? "input-error" : ""
+                    }`}
+                    defaultValue={NO_DISCOUNT_RATE}
+                    placeholder={NO_DISCOUNT_RATE}
+                    suffix={"%"}
+                    decimalScale={2}
+                    getInputRef={ref}
+                    name={name}
+                    value={value}
+                    onValueChange={(values) => onChange(values.formattedValue)}
+                    onBlur={(event) => {
+                      if (!event.target.value) {
+                        setValue("discount.rate", NO_DISCOUNT_RATE);
+                      }
+                    }}
+                  />
+                )}
               />
             </FormControl>
           )}
@@ -120,16 +156,31 @@ export function InvoiceAside() {
               label="Amount"
               error={errors.discount?.rate?.message}
             >
-              <TextInput
-                width="w-1/2"
-                type="number"
-                {...register("discount.rate", {
-                  required: {
-                    value: isFlatDiscount,
-                    message: "discount amount is required",
-                  },
-                  valueAsNumber: true,
-                })}
+              <Controller
+                control={control}
+                name="discount.rate"
+                render={({
+                  field: { onChange, name, value, ref },
+                  fieldState: { error },
+                }) => (
+                  <NumericFormat
+                    className={`input input-bordered w-1/2 ${
+                      error ? "input-error" : ""
+                    }`}
+                    getInputRef={ref}
+                    name={name}
+                    value={value}
+                    onValueChange={(values) => onChange(values.formattedValue)}
+                    onBlur={(event) => {
+                      if (!event.target.value) {
+                        setValue("discount.rate", NO_DISCOUNT_FLAT);
+                      }
+                    }}
+                    decimalScale={2}
+                    defaultValue={NO_DISCOUNT_FLAT}
+                    placeholder={NO_DISCOUNT_FLAT}
+                  />
+                )}
               />
             </FormControl>
           )}

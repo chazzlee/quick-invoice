@@ -2,7 +2,8 @@ import { useCallback } from "react";
 import { useInvoiceFormContext } from "./useInvoiceFormContext";
 import { useInvoiceFormValues } from "./useInvoiceFormValues";
 import { useInvoiceFieldArray } from "./useInvoiceFieldArray";
-import type { LineItem } from "../types";
+import { LineItemSchema } from "@/schemas";
+import { convertPercentageToFloat } from "@/utils/convertPercentageToFloat";
 
 export function useTax() {
   const { setValue } = useInvoiceFormContext();
@@ -14,7 +15,11 @@ export function useTax() {
   const isTaxable = taxType !== "no_tax";
 
   const updateTotalTax = useCallback(() => {
-    const totalTax = calculateTotalTax(lineItems, taxRate);
+    const totalTax = calculateTotalTax(
+      lineItems,
+      convertPercentageToFloat(taxRate)
+    );
+
     if (taxType === "on_total") {
       setValue("balance.totalTax", totalTax);
     } else if (taxType === "deducted") {
@@ -27,30 +32,19 @@ export function useTax() {
     }
   }, [lineItems, setValue, taxRate, taxType]);
 
-  const selectTaxType = useCallback(() => {
-    if (taxType !== "no_tax") {
-      replace(lineItems.map((item) => ({ ...item, taxable: true })));
-      if (taxRate > 0) {
-        updateTotalTax();
-      }
-    } else {
-      replace(lineItems.map((item) => ({ ...item, taxable: false })));
-      setValue("tax.rate", 0);
-      setValue("balance.totalTax", 0);
-    }
-  }, [replace, setValue, lineItems, taxRate, taxType, updateTotalTax]);
-
   return {
     taxType,
     taxRate,
     isTaxable,
     updateTotalTax,
-    selectTaxType,
   };
 }
 
-function calculateTotalTax(lineItems: LineItem[], taxRate: number): number {
+function calculateTotalTax(
+  lineItems: LineItemSchema[],
+  taxRate: number
+): number {
   return lineItems
     .filter((lineItem) => lineItem.taxable)
-    .reduce((acc, prev) => acc + prev.amount * (taxRate / 100), 0);
+    .reduce((acc, prev) => acc + prev.amount * taxRate, 0);
 }

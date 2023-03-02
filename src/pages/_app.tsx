@@ -4,6 +4,7 @@ import type { AppProps } from "next/app";
 import { defaultInvoice } from "@/features/invoices/defaults";
 import { invoiceFormSchema, InvoiceFormSchema } from "@/schemas";
 import "@/styles/globals.css";
+import { DevTool } from "@hookform/devtools";
 
 export default function App({ Component, pageProps }: AppProps) {
   const methods = useForm<InvoiceFormSchema>({
@@ -15,6 +16,7 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <FormProvider {...methods}>
       <Component {...pageProps} />
+      {/* <DevTool control={methods.control} /> */}
     </FormProvider>
   );
 }

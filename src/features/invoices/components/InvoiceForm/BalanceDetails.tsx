@@ -26,13 +26,13 @@ export function BalanceDetails() {
         </div>
         {isDiscountable ? (
           <div className="flex justify-between w-1/2">
-            <p>Discount {isPercentageDiscount && `(${discountRate}%)`}</p>
+            <p>Discount {isPercentageDiscount && `(${discountRate})`}</p>
             <p>{formatCurrency(totalDiscount * -1)}</p>
           </div>
         ) : null}
         {isTaxable ? (
           <div className="flex justify-between w-1/2">
-            <p>Tax ({taxRate}%)</p>
+            <p>Tax ({taxRate})</p>
             <p>{formatCurrency(totalTax)}</p>
           </div>
         ) : null}
