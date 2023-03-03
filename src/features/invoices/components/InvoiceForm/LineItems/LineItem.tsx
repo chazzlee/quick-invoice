@@ -32,10 +32,13 @@ export function LineItem({ index, onRemove }: LineItemProps) {
   useEffect(() => {
     function updateAmount(rate: string, quantity: number) {
       let amount = parseFloat(rate) * quantity;
-      setValue(`lineItems.${index}.amount`, amount);
+      setValue(`lineItems.${index}.amount`, amount.toString());
     }
     function updateSubtotal() {
-      const subtotal = lineItems.reduce((acc, prev) => acc + prev.amount, 0);
+      const subtotal = lineItems.reduce(
+        (acc, prev) => acc + parseFloat(prev.amount),
+        0
+      );
       setValue("balance.subtotal", subtotal);
     }
     updateAmount(rate, quantity);

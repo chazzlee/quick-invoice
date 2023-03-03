@@ -1,10 +1,12 @@
 import { TERMS_TYPE } from "@/features/invoices/types";
 import { z } from "zod";
 
+const ONLY_DIGITS_REGEX = /^[-+]?[0-9]+[.]?[0-9]*([eE][-+]?[0-9]+)?$/;
 export const NO_TAX_RATE = "0.000%" as const;
 export const NO_DISCOUNT_RATE = "0.00%" as const;
 export const NO_DISCOUNT_FLAT = "0.00" as const;
 export const NO_LINE_ITEM_RATE = "00.00" as const;
+export const NO_AMOUNT = "0.00" as const;
 
 //TODO: set  defaults for num inputs
 export const generalDetailsSchema = z.object({
@@ -35,12 +37,9 @@ export const generalDetailsSchema = z.object({
 const lineItemSchema = z.object({
   description: z.string().min(1, { message: "Item description is required" }),
   details: z.string(),
-  rate: z
-    .string()
-    .regex(/^[-+]?[0-9]+[.]?[0-9]*([eE][-+]?[0-9]+)?$/)
-    .default(NO_LINE_ITEM_RATE),
+  rate: z.string().regex(ONLY_DIGITS_REGEX).default(NO_LINE_ITEM_RATE),
   quantity: z.number().default(1),
-  amount: z.number().default(0),
+  amount: z.string().regex(ONLY_DIGITS_REGEX).default(NO_AMOUNT),
   taxable: z.boolean().default(false),
 });
 
@@ -82,10 +81,7 @@ export const invoiceFormSchema = z.object({
     }),
     z.object({
       kind: z.literal("flat_amount"),
-      rate: z
-        .string()
-        .regex(/^[-+]?[0-9]+[.]?[0-9]*([eE][-+]?[0-9]+)?$/)
-        .default(NO_DISCOUNT_FLAT),
+      rate: z.string().regex(ONLY_DIGITS_REGEX).default(NO_DISCOUNT_FLAT),
     }),
     z.object({
       kind: z.literal("percent"),

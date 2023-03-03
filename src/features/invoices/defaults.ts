@@ -3,6 +3,7 @@ import {
   GeneralDetailsSchema,
   InvoiceFormSchema,
   LineItemSchema,
+  NO_AMOUNT,
   NO_DISCOUNT_FLAT,
   NO_DISCOUNT_RATE,
   NO_LINE_ITEM_RATE,
@@ -26,7 +27,7 @@ export const defaultLineItem: LineItemSchema = {
   details: "",
   rate: NO_LINE_ITEM_RATE,
   quantity: 1,
-  amount: 0,
+  amount: NO_AMOUNT,
   taxable: false,
 };
 
