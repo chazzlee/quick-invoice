@@ -1,3 +1,4 @@
+import { NO_DISCOUNT_RATE } from "@/schemas";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { useEffect } from "react";
 import { useDiscount } from "../../hooks/useDiscount";
@@ -17,6 +18,7 @@ export function BalanceDetails() {
     setValue("balance.balanceDue", total);
   }, [setValue, subtotal, total, totalDiscount, totalTax]);
 
+  console.log(discountRate || "hello");
   return (
     <div className="grid grid-cols-2 gap-8 pt-4">
       <div className="col-start-2">
@@ -26,7 +28,10 @@ export function BalanceDetails() {
         </div>
         {isDiscountable ? (
           <div className="flex justify-between w-1/2">
-            <p>Discount {isPercentageDiscount && `(${discountRate})`}</p>
+            <p>
+              Discount{" "}
+              {isPercentageDiscount && `(${discountRate || NO_DISCOUNT_RATE})`}
+            </p>
             <p>{formatCurrency(totalDiscount * -1)}</p>
           </div>
         ) : null}
