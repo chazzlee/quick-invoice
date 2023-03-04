@@ -1,3 +1,4 @@
+import { NO_TOTAL } from "@/schemas";
 import { convertPercentageToFloat } from "@/utils/convertPercentageToFloat";
 import { useCallback } from "react";
 import { useInvoiceFormContext } from "./useInvoiceFormContext";
@@ -21,10 +22,10 @@ export function useDiscount() {
       setValue("balance.totalDiscount", discountRate);
     } else if (discountType === "percent") {
       const discountPercentage = convertPercentageToFloat(discountRate);
-      const totalDiscount = subtotal * discountPercentage;
-      setValue("balance.totalDiscount", totalDiscount);
+      const totalDiscount = parseFloat(subtotal) * discountPercentage;
+      setValue("balance.totalDiscount", totalDiscount.toString());
     } else {
-      setValue("balance.totalDiscount", 0);
+      setValue("balance.totalDiscount", NO_TOTAL);
     }
   }, [discountRate, discountType, setValue, subtotal]);
 

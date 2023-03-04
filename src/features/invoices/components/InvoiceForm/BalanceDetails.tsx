@@ -14,7 +14,12 @@ export function BalanceDetails() {
   const { isDiscountable, isPercentageDiscount, discountRate } = useDiscount();
 
   useEffect(() => {
-    setValue("balance.total", subtotal + totalTax - totalDiscount);
+    setValue(
+      "balance.total",
+      `${
+        parseFloat(subtotal) + parseFloat(totalTax) - parseFloat(totalDiscount)
+      }`
+    );
     setValue("balance.balanceDue", total);
   }, [setValue, subtotal, total, totalDiscount, totalTax]);
 
@@ -31,7 +36,7 @@ export function BalanceDetails() {
               Discount{" "}
               {isPercentageDiscount && `(${discountRate || NO_DISCOUNT_RATE})`}
             </p>
-            <p>{formatCurrency(totalDiscount * -1)}</p>
+            <p>{formatCurrency(parseFloat(totalDiscount) * -1)}</p>
           </div>
         ) : null}
         {isTaxable ? (

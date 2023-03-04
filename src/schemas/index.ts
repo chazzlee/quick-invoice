@@ -7,6 +7,7 @@ export const NO_DISCOUNT_RATE = "0.00%" as const;
 export const NO_DISCOUNT_FLAT = "0.00" as const;
 export const NO_LINE_ITEM_RATE = "00.00" as const;
 export const NO_AMOUNT = "0.00" as const;
+export const NO_TOTAL = "0.00" as const;
 
 //TODO: set  defaults for num inputs
 export const generalDetailsSchema = z.object({
@@ -58,11 +59,11 @@ export const invoiceFormSchema = z.object({
     }),
   }),
   balance: z.object({
-    subtotal: z.number(),
-    totalTax: z.number(),
-    totalDiscount: z.number(),
-    total: z.number(),
-    balanceDue: z.number(),
+    subtotal: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
+    totalTax: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
+    totalDiscount: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
+    total: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
+    balanceDue: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
   }),
   tax: z.discriminatedUnion("kind", [
     z.object({

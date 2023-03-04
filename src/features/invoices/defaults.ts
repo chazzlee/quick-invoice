@@ -5,9 +5,9 @@ import {
   LineItemSchema,
   NO_AMOUNT,
   NO_DISCOUNT_FLAT,
-  NO_DISCOUNT_RATE,
   NO_LINE_ITEM_RATE,
   NO_TAX_RATE,
+  NO_TOTAL,
 } from "@/schemas";
 
 export const defaultGeneralDetails: GeneralDetailsSchema = {
@@ -55,10 +55,10 @@ export const defaultInvoice: InvoiceFormSchema = {
   },
   lineItems: [defaultLineItem],
   balance: {
-    subtotal: 0,
-    total: 0,
-    totalTax: 0,
-    totalDiscount: 0,
-    balanceDue: 0,
+    subtotal: NO_TOTAL,
+    total: NO_TOTAL,
+    totalTax: NO_TOTAL,
+    totalDiscount: NO_TOTAL,
+    balanceDue: NO_TOTAL,
   },
 };

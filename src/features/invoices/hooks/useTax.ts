@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { useInvoiceFormContext } from "./useInvoiceFormContext";
 import { useInvoiceFormValues } from "./useInvoiceFormValues";
 import { useInvoiceFieldArray } from "./useInvoiceFieldArray";
-import { LineItemSchema } from "@/schemas";
+import { LineItemSchema, NO_TOTAL } from "@/schemas";
 import { convertPercentageToFloat } from "@/utils/convertPercentageToFloat";
 
 export function useTax() {
@@ -21,14 +21,14 @@ export function useTax() {
     );
 
     if (taxType === "on_total") {
-      setValue("balance.totalTax", totalTax);
+      setValue("balance.totalTax", totalTax.toString());
     } else if (taxType === "deducted") {
-      setValue("balance.totalTax", totalTax * -1);
+      setValue("balance.totalTax", (totalTax * -1).toString());
     } else if (taxType === "per_item") {
       console.log("TODO: MUST IMPLEMENT");
-      setValue("balance.totalTax", totalTax);
+      setValue("balance.totalTax", totalTax.toString());
     } else {
-      setValue("balance.totalTax", 0);
+      setValue("balance.totalTax", NO_TOTAL);
     }
   }, [lineItems, setValue, taxRate, taxType]);
 
@@ -46,5 +46,5 @@ function calculateTotalTax(
 ): number {
   return lineItems
     .filter((lineItem) => lineItem.taxable)
-    .reduce((acc, prev) => acc + prev.amount * taxRate, 0);
+    .reduce((acc, prev) => acc + parseFloat(prev.amount) * taxRate, 0);
 }

@@ -1,4 +1,4 @@
-import { isKeyOf } from "@/utils/isKey";
+import { isKeyOf } from "@/utils/isKeyOf";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { setTimeout } from "timers/promises";
 

@@ -21,13 +21,11 @@ export function InvoiceForm() {
   } = useInvoiceFormContext();
   const router = useRouter();
 
-  // console.log("error", errors);
-  // console.log("form", getValues());
-
   return (
     <form
       onSubmit={handleSubmit((data) => {
-        console.log(data);
+        console.log("helo");
+        router.push("/preview");
       })}
     >
       <div className="grid grid-cols-2 gap-8">
@@ -59,7 +57,13 @@ export function InvoiceForm() {
         <button className="btn" type="submit">
           Preview PDF
         </button>
-        <button onClick={() => console.log(getValues())}>DEBUG</button>
+        <button
+          type="button"
+          onClick={() => console.log(getValues())}
+          className="ml-4 btn btn-error"
+        >
+          DEBUG
+        </button>
       </div>
     </form>
   );

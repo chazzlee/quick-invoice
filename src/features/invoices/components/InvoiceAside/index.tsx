@@ -9,7 +9,12 @@ import type { DiscountType, TaxType } from "../../types";
 import { useInvoiceFieldArray } from "../../hooks/useInvoiceFieldArray";
 import { useInvoiceFormValues } from "../../hooks/useInvoiceFormValues";
 import { NumericFormat, PatternFormat } from "react-number-format";
-import { NO_DISCOUNT_FLAT, NO_DISCOUNT_RATE, NO_TAX_RATE } from "@/schemas";
+import {
+  NO_DISCOUNT_FLAT,
+  NO_DISCOUNT_RATE,
+  NO_TAX_RATE,
+  NO_TOTAL,
+} from "@/schemas";
 
 export function InvoiceAside() {
   const {
@@ -49,8 +54,8 @@ export function InvoiceAside() {
                     replace(
                       lineItems.map((item) => ({ ...item, taxable: false }))
                     );
-                    setValue("tax.rate", "0.000%");
-                    setValue("balance.totalTax", 0);
+                    setValue("tax.rate", NO_TAX_RATE);
+                    setValue("balance.totalTax", NO_TOTAL);
                   } else {
                     replace(
                       lineItems.map((item) => ({ ...item, taxable: true }))
