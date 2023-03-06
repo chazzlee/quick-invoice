@@ -8,9 +8,11 @@ type SelectInputProps = ComponentPropsWithRef<"select"> & {
 };
 
 // TODO: default selected
-// eslint-disable-next-line react/display-name
 export const SelectInput = forwardRef<HTMLSelectElement, SelectInputProps>(
-  ({ defaultLabel, selectOptions = [], classes = "", ...rest }, ref) => {
+  function SelectInput(
+    { defaultLabel, selectOptions = [], classes = "", ...rest },
+    ref
+  ) {
     return (
       <select
         ref={ref}

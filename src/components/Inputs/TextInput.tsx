@@ -13,9 +13,8 @@ type TextInputProps = ComponentPropsWithRef<"input"> & {
   classes?: string;
 };
 
-// eslint-disable-next-line react/display-name
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  (
+  function TextInput(
     {
       id,
       inputSize = "md",
@@ -25,7 +24,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       ...rest
     },
     ref
-  ) => {
+  ) {
     return (
       <input
         ref={ref}

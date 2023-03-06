@@ -1,9 +1,9 @@
 import { type ComponentPropsWithRef, forwardRef } from "react";
 
 type TextareaProps = ComponentPropsWithRef<"textarea"> & {};
-// eslint-disable-next-line react/display-name
+
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ ...rest }, ref) => {
+  function Textarea({ ...rest }, ref) {
     return (
       <textarea
         ref={ref}
