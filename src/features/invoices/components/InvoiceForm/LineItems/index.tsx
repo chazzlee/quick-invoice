@@ -1,11 +1,10 @@
-import { useFieldArray } from "react-hook-form";
-import { LineItemsHeader } from "./LineItemsHeader";
-import { LineItem } from "./LineItem";
-import { AddMoreButton } from "./AddMoreButton";
+import { useCallback } from "react";
 import { defaultLineItem } from "@/features/invoices/defaults";
 import { useInvoiceFieldArray } from "@/features/invoices/hooks/useInvoiceFieldArray";
 import { useInvoiceFormContext } from "@/features/invoices/hooks/useInvoiceFormContext";
-import { useCallback } from "react";
+import { LineItemsHeader } from "./LineItemsHeader";
+import { LineItem } from "./LineItem";
+import { AddMoreButton } from "./AddMoreButton";
 
 export function LineItems() {
   const { clearErrors } = useInvoiceFormContext();

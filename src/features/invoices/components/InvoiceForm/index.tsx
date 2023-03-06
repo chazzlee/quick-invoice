@@ -9,6 +9,7 @@ import { BalanceDetails } from "./BalanceDetails";
 import { ExtraNotes } from "./ExtraNotes";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
 import { useRouter } from "next/router";
+import { ShippingDetails } from "./ShippingDetails";
 
 const FROM = "from";
 const TO = "to";
@@ -24,7 +25,6 @@ export function InvoiceForm() {
   return (
     <form
       onSubmit={handleSubmit((data) => {
-        console.log("helo");
         router.push("/preview");
       })}
     >
@@ -47,6 +47,7 @@ export function InvoiceForm() {
 
       <div className="grid grid-cols-2 gap-8">
         <InvoiceDetails />
+        <ShippingDetails />
       </div>
 
       <LineItems />

@@ -61,4 +61,5 @@ export const defaultInvoice: InvoiceFormSchema = {
     totalDiscount: NO_TOTAL,
     balanceDue: NO_TOTAL,
   },
+  shipping: structuredClone(defaultGeneralDetails),
 };

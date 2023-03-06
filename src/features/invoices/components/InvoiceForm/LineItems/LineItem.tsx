@@ -99,7 +99,9 @@ export function LineItem({ index, onRemove }: LineItemProps) {
             getInputRef={ref}
             name={name}
             value={value}
-            onValueChange={(values) => onChange(values.formattedValue)}
+            onValueChange={(values) => {
+              onChange(values.formattedValue);
+            }}
             onBlur={(e) => {
               if (!e.target.value) {
                 setValue(`lineItems.${index}.rate`, NO_LINE_ITEM_RATE);
@@ -107,6 +109,7 @@ export function LineItem({ index, onRemove }: LineItemProps) {
             }}
             className="w-2/12 input input-bordered"
             decimalScale={2}
+            fixedDecimalScale={true}
             placeholder={NO_LINE_ITEM_RATE}
             allowNegative={false}
           />

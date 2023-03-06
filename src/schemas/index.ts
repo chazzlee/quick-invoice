@@ -5,11 +5,12 @@ const ONLY_DIGITS_REGEX = /^[-+]?[0-9]+[.]?[0-9]*([eE][-+]?[0-9]+)?$/;
 export const NO_TAX_RATE = "0.000%" as const;
 export const NO_DISCOUNT_RATE = "0.00%" as const;
 export const NO_DISCOUNT_FLAT = "0.00" as const;
-export const NO_LINE_ITEM_RATE = "00.00" as const;
+export const NO_LINE_ITEM_RATE = "0.00" as const;
 export const NO_AMOUNT = "0.00" as const;
 export const NO_TOTAL = "0.00" as const;
 
 //TODO: set  defaults for num inputs
+
 export const generalDetailsSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
   email: z
@@ -49,6 +50,7 @@ export const invoiceFormSchema = z.object({
   logo: z.any(), //TODO:
   from: generalDetailsSchema,
   to: generalDetailsSchema,
+  shipping: generalDetailsSchema.optional(),
   invoice: z.object({
     number: z.string().min(1),
     date: z.string(),
