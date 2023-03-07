@@ -1,18 +1,31 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useInvoiceFormContext } from "@/features/invoices/hooks/useInvoiceFormContext";
+import Image from "next/image";
 
 function Header({
   companyName,
   title,
+  logo,
 }: {
   companyName: string;
   title: string;
+  logo: any;
 }) {
   return (
     <header className="flex items-center justify-between">
       <div className="flex items-center gap-3">
-        <div style={{ width: 50, height: 50, backgroundColor: "darkblue" }} />
+        {logo ? (
+          <Image
+            src={URL.createObjectURL(logo.item(0))}
+            alt="company logo"
+            height={50}
+            width={50}
+            onLoad={(e) => URL.revokeObjectURL(e.currentTarget.src)}
+          />
+        ) : (
+          <div style={{ width: 50, height: 50, backgroundColor: "darkblue" }} />
+        )}
         <h2 className="text-3xl">{companyName}</h2>
       </div>
       <div>
@@ -106,21 +119,15 @@ function LineItemsTable({ lineItems }: { lineItems: any[] }) {
         </tr>
       </thead>
       <tbody>
-        {lineItems.map((item, index) => (
-          <tr key={index}>
-            <td className="border-r">{item.description}</td>
-            <td className="border-r">{item.rate}</td>
-            <td className="border-r">{item.quantity}</td>
-            <td>{item.amount}</td>
-          </tr>
-        ))}
-        {/* TODO: */}
-        {Array.from({ length: 10 }).map((item, index) => (
+        {Array.from({ length: 14 }).map((_item, index) => (
           <tr key={index} className="h-9">
-            <td className="border-r " />
-            <td className="border-r" />
-            <td className="border-r" />
-            <td />
+            <td className="border-r">
+              <p>{lineItems[index]?.description}</p>
+              <p className="pt-2 pl-8 text-xs">{lineItems[index]?.details}</p>
+            </td>
+            <td className="border-r">{lineItems[index]?.rate}</td>
+            <td className="border-r">{lineItems[index]?.quantity}</td>
+            <td>{lineItems[index]?.amount}</td>
           </tr>
         ))}
       </tbody>
@@ -187,7 +194,11 @@ export default function Preview() {
         <section className="grid grid-cols-[3fr_1fr] gap-8 pb-4">
           <article className="px-8 pt-12 pb-32 mb-20 bg-white border-t-4 border-b-4 border-gray-600">
             <div className="pb-4">
-              <Header title={values.title} companyName={values.from.name} />
+              <Header
+                title={values.title}
+                companyName={values.from.name}
+                logo={values.logo}
+              />
             </div>
             <div className="pb-12">
               <From

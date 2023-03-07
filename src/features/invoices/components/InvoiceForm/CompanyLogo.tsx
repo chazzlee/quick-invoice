@@ -15,12 +15,7 @@ export function CompanyLogo() {
   return (
     <div className="image-preview">
       <FormControl id="logo" label="Company logo">
-        <FileInput
-          {...register("logo", {
-            onChange(event: ChangeEvent<HTMLInputElement>) {},
-          })}
-          accept="image/*"
-        />
+        <FileInput {...register("logo")} accept="image/*" />
       </FormControl>
       <div className="w-1/2 mt-8 bg-white border h-28 logo-preview">
         {companyLogo ? (
