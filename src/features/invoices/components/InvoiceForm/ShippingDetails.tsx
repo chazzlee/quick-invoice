@@ -1,3 +1,4 @@
+import { type ChangeEvent } from "react";
 import { Controller } from "react-hook-form";
 import { PatternFormat } from "react-number-format";
 import { FormControl, SelectInput, TextInput } from "@/components/Inputs";
@@ -10,27 +11,28 @@ export function ShippingDetails() {
     control,
     setValue,
     getValues,
+    resetField,
     formState: { errors },
   } = useInvoiceFormContext();
+
+  const handleToggle = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      setValue("shipping.name", getValues("to.name"));
+      setValue("shipping.email", getValues("to.email"));
+      setValue("shipping.phone", getValues("to.phone"));
+      setValue("shipping.address", getValues("to.address"));
+    } else {
+      resetField("shipping");
+    }
+  };
 
   return (
     <div className="shipping">
       <h3>Ship to</h3>
-      <div className="form-control">
+      <div className="w-1/2 form-control">
         <label className="cursor-pointer label">
           <span className="label-text">Same as bill to</span>
-          <input
-            type="checkbox"
-            className="checkbox"
-            onChange={(e) => {
-              if (e.target.checked) {
-                setValue("shipping.name", getValues("to.name"));
-                setValue("shipping.email", getValues("to.email"));
-                setValue("shipping.phone", getValues("to.phone"));
-                setValue("shipping.address", getValues("to.address"));
-              }
-            }}
-          />
+          <input type="checkbox" className="checkbox" onChange={handleToggle} />
         </label>
       </div>
 

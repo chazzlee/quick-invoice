@@ -31,7 +31,7 @@ export function LineItem({ index, onRemove }: LineItemProps) {
   // TODO: use money lib
   useEffect(() => {
     function updateAmount(rate: string, quantity: number) {
-      let amount = parseFloat(rate || "0") * quantity;
+      let amount = parseFloat(rate || "0") * (quantity || 0);
       setValue(`lineItems.${index}.amount`, amount.toString());
     }
     function updateSubtotal() {
@@ -121,7 +121,14 @@ export function LineItem({ index, onRemove }: LineItemProps) {
         min={0}
         inputSize="sm"
         width="w-2/12"
-        {...register(`lineItems.${index}.quantity`, { valueAsNumber: true })}
+        {...register(`lineItems.${index}.quantity`, {
+          valueAsNumber: true,
+          onBlur(event) {
+            if (!event.target.value) {
+              setValue(`lineItems.${index}.quantity`, 1);
+            }
+          },
+        })}
       />
 
       <p className="w-2/12 mt-3 amount">{formatCurrency(amount)}</p>

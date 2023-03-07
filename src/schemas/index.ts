@@ -50,7 +50,7 @@ export const invoiceFormSchema = z.object({
   logo: z.any(), //TODO:
   from: generalDetailsSchema,
   to: generalDetailsSchema,
-  shipping: generalDetailsSchema.optional(),
+  shipping: generalDetailsSchema.optional(), //TODO:
   invoice: z.object({
     number: z.string().min(1),
     date: z.string(),
