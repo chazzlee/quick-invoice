@@ -2,6 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useInvoiceFormContext } from "@/features/invoices/hooks/useInvoiceFormContext";
 import Image from "next/image";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 function Header({
   companyName,
@@ -162,11 +163,11 @@ function Balance({ balance }: { balance: any }) {
         <div>Balance Due:</div>
       </div>
       <div className="text-end">
-        <div>{balance.subtotal}</div>
-        <div>{balance.totalDiscount}</div>
-        <div>{balance.totalTax}</div>
-        <div>{balance.total}</div>
-        <div>{balance.balanceDue}</div>
+        <div>{formatCurrency(balance.subtotal)}</div>
+        <div>{formatCurrency(balance.totalDiscount)}</div>
+        <div>{formatCurrency(balance.totalTax)}</div>
+        <div>{formatCurrency(balance.total)}</div>
+        <div>{formatCurrency(balance.balanceDue)}</div>
       </div>
     </div>
   );
