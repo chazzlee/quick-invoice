@@ -164,7 +164,7 @@ function Balance({ balance }: { balance: any }) {
       </div>
       <div className="text-end">
         <div>{formatCurrency(balance.subtotal)}</div>
-        <div>{formatCurrency(balance.totalDiscount)}</div>
+        <div>-{formatCurrency(balance.totalDiscount)}</div>
         <div>{formatCurrency(balance.totalTax)}</div>
         <div>{formatCurrency(balance.total)}</div>
         <div>{formatCurrency(balance.balanceDue)}</div>
