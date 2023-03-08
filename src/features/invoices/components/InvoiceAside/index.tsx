@@ -1,6 +1,10 @@
 import { type ChangeEvent } from "react";
 import { Controller } from "react-hook-form";
-import { selectDiscountTypes, selectTaxTypes } from "../../selectOptions";
+import {
+  selectDiscountTypes,
+  selectShippingTypes,
+  selectTaxTypes,
+} from "../../selectOptions";
 import { FormControl, SelectInput, TextInput } from "@/components/Inputs";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
 import { useTax } from "../../hooks/useTax";
@@ -12,6 +16,8 @@ import { NumericFormat, PatternFormat } from "react-number-format";
 import {
   NO_DISCOUNT_FLAT,
   NO_DISCOUNT_RATE,
+  NO_SHIPPING_FLAT,
+  NO_SHIPPING_RATE,
   NO_TAX_RATE,
   NO_TOTAL,
 } from "@/schemas";
@@ -27,11 +33,13 @@ export function InvoiceAside() {
   } = useInvoiceFormContext();
   const taxRateInput = register("tax.rate");
 
-  const { lineItems } = useInvoiceFormValues();
+  const { lineItems, shipping } = useInvoiceFormValues();
   const { replace } = useInvoiceFieldArray();
   const { taxRate, isTaxable, updateTotalTax } = useTax();
 
   const { isFlatDiscount, isPercentageDiscount, discountRate } = useDiscount();
+  const isFlatShipping = shipping.kind === "flat_amount";
+  const isPercentageShipping = shipping.kind === "percent";
 
   return (
     <aside>
@@ -114,7 +122,7 @@ export function InvoiceAside() {
               selectOptions={selectDiscountTypes}
               {...register("discount.kind", {
                 onChange(event: ChangeEvent<HTMLSelectElement>) {
-                  resetField("discount.rate");
+                  // resetField("discount.rate");
                 },
               })}
             />
@@ -184,6 +192,88 @@ export function InvoiceAside() {
                     decimalScale={2}
                     defaultValue={NO_DISCOUNT_FLAT}
                     placeholder={NO_DISCOUNT_FLAT}
+                  />
+                )}
+              />
+            </FormControl>
+          )}
+        </div>
+
+        {/* Shipping */}
+        <div className="pt-8 shipping-container">
+          <h3 className="font-semibold">Shipping</h3>
+          <FormControl id="shipping-type" label="Shipping">
+            <SelectInput
+              selectOptions={selectShippingTypes}
+              {...register("shipping.kind")}
+            />
+          </FormControl>
+
+          {isPercentageShipping && (
+            <FormControl
+              id="shipping-percent"
+              label="Percent"
+              error={errors.shipping?.rate?.message}
+            >
+              <Controller
+                control={control}
+                name="shipping.rate"
+                render={({
+                  field: { onChange, name, ref, value },
+                  fieldState: { error },
+                }) => (
+                  <NumericFormat
+                    className={`input input-bordered w-1/2 ${
+                      error ? "input-error" : ""
+                    }`}
+                    defaultValue={NO_SHIPPING_RATE}
+                    placeholder={NO_SHIPPING_RATE}
+                    suffix={"%"}
+                    decimalScale={2}
+                    getInputRef={ref}
+                    name={name}
+                    value={value}
+                    onValueChange={(values) => onChange(values.formattedValue)}
+                    onBlur={(event) => {
+                      if (!event.target.value) {
+                        setValue("shipping.rate", NO_SHIPPING_RATE);
+                      }
+                    }}
+                  />
+                )}
+              />
+            </FormControl>
+          )}
+
+          {isFlatShipping && (
+            <FormControl
+              id="shipping-flat-amount"
+              label="Amount"
+              error={errors.shipping?.rate?.message}
+            >
+              <Controller
+                control={control}
+                name="shipping.rate"
+                render={({
+                  field: { onChange, name, value, ref },
+                  fieldState: { error },
+                }) => (
+                  <NumericFormat
+                    className={`input input-bordered w-1/2 ${
+                      error ? "input-error" : ""
+                    }`}
+                    getInputRef={ref}
+                    name={name}
+                    value={value}
+                    onValueChange={(values) => onChange(values.formattedValue)}
+                    onBlur={(event) => {
+                      if (!event.target.value) {
+                        setValue("shipping.rate", NO_SHIPPING_FLAT);
+                      }
+                    }}
+                    decimalScale={2}
+                    defaultValue={NO_SHIPPING_FLAT}
+                    placeholder={NO_SHIPPING_FLAT}
                   />
                 )}
               />

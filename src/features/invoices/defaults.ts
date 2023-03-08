@@ -6,6 +6,7 @@ import {
   NO_AMOUNT,
   NO_DISCOUNT_FLAT,
   NO_LINE_ITEM_RATE,
+  NO_SHIPPING_FLAT,
   NO_TAX_RATE,
   NO_TOTAL,
 } from "@/schemas";
@@ -53,6 +54,10 @@ export const defaultInvoice: InvoiceFormSchema = {
     kind: "no_discount",
     rate: NO_DISCOUNT_FLAT,
   },
+  shipping: {
+    kind: "no_shipping",
+    rate: NO_SHIPPING_FLAT,
+  },
   lineItems: [defaultLineItem],
   balance: {
     subtotal: NO_TOTAL,
@@ -61,5 +66,5 @@ export const defaultInvoice: InvoiceFormSchema = {
     totalDiscount: NO_TOTAL,
     balanceDue: NO_TOTAL,
   },
-  shipping: structuredClone(defaultGeneralDetails),
+  shipTo: structuredClone(defaultGeneralDetails),
 };

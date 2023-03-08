@@ -1,6 +1,7 @@
 import { TERMS_TYPE } from "@/features/invoices/types";
 import { z } from "zod";
 
+// FIXME:
 const ONLY_DIGITS_REGEX = /^[-+]?[0-9]+[.]?[0-9]*([eE][-+]?[0-9]+)?$/;
 export const NO_TAX_RATE = "0.000%" as const;
 export const NO_DISCOUNT_RATE = "0.00%" as const;
@@ -8,6 +9,8 @@ export const NO_DISCOUNT_FLAT = "0.00" as const;
 export const NO_LINE_ITEM_RATE = "0.00" as const;
 export const NO_AMOUNT = "0.00" as const;
 export const NO_TOTAL = "0.00" as const;
+export const NO_SHIPPING_RATE = "0.00%" as const;
+export const NO_SHIPPING_FLAT = "0.00" as const;
 
 //TODO: set  defaults for num inputs
 
@@ -50,7 +53,7 @@ export const invoiceFormSchema = z.object({
   logo: z.any(), //TODO:
   from: generalDetailsSchema,
   to: generalDetailsSchema,
-  shipping: generalDetailsSchema.optional(), //TODO:
+  shipTo: generalDetailsSchema.optional(), //TODO:
   invoice: z.object({
     number: z.string().min(1),
     date: z.string(),
@@ -89,6 +92,24 @@ export const invoiceFormSchema = z.object({
     z.object({
       kind: z.literal("percent"),
       rate: z.string().endsWith("%").default(NO_DISCOUNT_RATE),
+    }),
+  ]),
+  shipping: z.discriminatedUnion("kind", [
+    z.object({
+      kind: z.literal("no_shipping"),
+      rate: z.literal(NO_SHIPPING_FLAT),
+    }),
+    z.object({
+      kind: z.literal("free"),
+      rate: z.literal(NO_SHIPPING_FLAT),
+    }),
+    z.object({
+      kind: z.literal("flat_amount"),
+      rate: z.string().regex(ONLY_DIGITS_REGEX).default(NO_SHIPPING_FLAT),
+    }),
+    z.object({
+      kind: z.literal("percent"),
+      rate: z.string().endsWith("%").default(NO_SHIPPING_RATE),
     }),
   ]),
   lineItems: z.array(lineItemSchema),

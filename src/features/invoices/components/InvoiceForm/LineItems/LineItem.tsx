@@ -8,6 +8,7 @@ import { useDiscount } from "@/features/invoices/hooks/useDiscount";
 import { NumericFormat } from "react-number-format";
 import { Controller } from "react-hook-form";
 import { NO_LINE_ITEM_RATE } from "@/schemas";
+import Money from "dinero.js";
 
 type LineItemProps = {
   readonly index: number;
@@ -28,7 +29,6 @@ export function LineItem({ index, onRemove }: LineItemProps) {
 
   const { rate, quantity, amount } = lineItems[index];
 
-  // TODO: use money lib
   useEffect(() => {
     function updateAmount(rate: string, quantity: number) {
       let amount = parseFloat(rate || "0") * (quantity || 0);

@@ -37,6 +37,13 @@ export const selectDiscountTypes: SelectOption[] = [
   { label: "Flat amount", value: "flat_amount" },
 ];
 
+export const selectShippingTypes: SelectOption[] = [
+  { label: "None", value: "no_shipping" },
+  { label: "Free", value: "free" },
+  { label: "Flat amount", value: "flat_amount" },
+  { label: "Percent", value: "percent" },
+];
+
 export const selectStates = [
   { label: "Alabama", value: "AL" },
   { label: "Alaska", value: "AK" },

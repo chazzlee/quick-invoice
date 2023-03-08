@@ -17,10 +17,10 @@ export function ShippingDetails() {
 
   const handleToggle = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      setValue("shipping.name", getValues("to.name"));
-      setValue("shipping.email", getValues("to.email"));
-      setValue("shipping.phone", getValues("to.phone"));
-      setValue("shipping.address", getValues("to.address"));
+      setValue("shipTo.name", getValues("to.name"));
+      setValue("shipTo.email", getValues("to.email"));
+      setValue("shipTo.phone", getValues("to.phone"));
+      setValue("shipTo.address", getValues("to.address"));
     } else {
       resetField("shipping");
     }
@@ -37,77 +37,77 @@ export function ShippingDetails() {
       </div>
 
       <FormControl
-        id="shipping-name"
+        id="ship-to-name"
         label="Name"
-        error={errors.shipping?.name?.message}
+        error={errors.shipTo?.name?.message}
       >
         <TextInput
-          classes={`${errors.shipping?.name ? "input-error" : ""}`}
-          {...register("shipping.name")}
+          classes={`${errors.shipTo?.name ? "input-error" : ""}`}
+          {...register("shipTo.name")}
         />
       </FormControl>
       <FormControl
-        id="shipping-email"
+        id="ship-to-email"
         label="Email"
-        error={errors.shipping?.email?.message}
+        error={errors.shipTo?.email?.message}
       >
         <TextInput
           type="email"
-          classes={`${errors.shipping?.email ? "input-error" : ""}`}
-          {...register("shipping.email")}
+          classes={`${errors.shipTo?.email ? "input-error" : ""}`}
+          {...register("shipTo.email")}
         />
       </FormControl>
       <FormControl
-        id="shipping-phone"
+        id="ship-to-phone"
         label="phone"
-        error={errors.shipping?.phone?.message}
+        error={errors.shipTo?.phone?.message}
       >
         <TextInput
-          classes={`${errors.shipping?.phone ? "input-error" : ""}`}
-          {...register("shipping.phone")}
+          classes={`${errors.shipTo?.phone ? "input-error" : ""}`}
+          {...register("shipTo.phone")}
         />
       </FormControl>
       <FormControl
-        id="shipping-street"
+        id="ship-to-street"
         label="Street"
-        error={errors.shipping?.address?.street?.message}
+        error={errors.shipTo?.address?.street?.message}
       >
         <TextInput
-          classes={`${errors.shipping?.address?.street ? "input-error" : ""}`}
-          {...register("shipping.address.street")}
+          classes={`${errors.shipTo?.address?.street ? "input-error" : ""}`}
+          {...register("shipTo.address.street")}
         />
       </FormControl>
       <FormControl
-        id="shipping-city"
+        id="ship-to-city"
         label="City"
-        error={errors.shipping?.address?.city?.message}
+        error={errors.shipTo?.address?.city?.message}
       >
         <TextInput
-          classes={`${errors.shipping?.address?.city ? "input-error" : ""}`}
-          {...register("shipping.address.city")}
+          classes={`${errors.shipTo?.address?.city ? "input-error" : ""}`}
+          {...register("shipTo.address.city")}
         />
       </FormControl>
       <div className="flex">
         <FormControl
-          id={`shipping-state`}
+          id={`ship-to-state`}
           label="State"
-          error={errors.shipping?.address?.state?.message}
+          error={errors.shipTo?.address?.state?.message}
         >
           <SelectInput
             selectOptions={selectStates}
             defaultLabel="Choose state"
-            classes={`${errors.shipping?.address?.state ? "select-error" : ""}`}
-            {...register("shipping.address.state")}
+            classes={`${errors.shipTo?.address?.state ? "select-error" : ""}`}
+            {...register("shipTo.address.state")}
           />
         </FormControl>
         <FormControl
-          id="shipping-zipCode"
+          id="ship-to-zipCode"
           label="Zip code"
-          error={errors.shipping?.address?.zipCode?.message}
+          error={errors.shipTo?.address?.zipCode?.message}
         >
           <Controller
             control={control}
-            name={"shipping.address.zipCode"}
+            name={"shipTo.address.zipCode"}
             render={({
               field: { onChange, name, value, ref },
               fieldState: { error },
