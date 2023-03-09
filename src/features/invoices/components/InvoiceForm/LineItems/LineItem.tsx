@@ -7,7 +7,6 @@ import { useTax } from "@/features/invoices/hooks/useTax";
 import { useDiscount } from "@/features/invoices/hooks/useDiscount";
 import { NumericFormat } from "react-number-format";
 import { Controller } from "react-hook-form";
-import { NO_LINE_ITEM_RATE } from "@/schemas";
 import Money from "dinero.js";
 
 type LineItemProps = {
@@ -15,10 +14,90 @@ type LineItemProps = {
   onRemove(index: number): void;
 };
 
+const replaceNaNWithZero = (value: unknown) => {
+  if (!value || Number.isNaN(value)) {
+    return 0;
+  }
+  return value as number;
+};
+
+function LineRate({ index }: { index: number }) {
+  const { control, getValues, setValue } = useInvoiceFormContext();
+
+  const getRateForDisplay = (valueInCents: number) => {
+    const value = replaceNaNWithZero(valueInCents);
+    const rateInCents = Money({ amount: value });
+    return rateInCents.toUnit();
+  };
+
+  const getRateInCents = (floatValue: number) => {
+    const value = replaceNaNWithZero(floatValue);
+    const valueInCents = Money({ amount: Math.round(value * 100) });
+    return valueInCents.getAmount();
+  };
+
+  return (
+    <Controller
+      control={control}
+      name={`lineItems.${index}.rate`}
+      render={({ field: { name, ref, onChange, value } }) => (
+        <NumericFormat
+          id={`rate-${index}`}
+          getInputRef={ref}
+          name={name}
+          value={getRateForDisplay(value)}
+          onValueChange={(values) =>
+            onChange(getRateInCents(values.floatValue ?? 0))
+          }
+          className="w-2/12 input input-bordered"
+          decimalScale={2}
+          fixedDecimalScale={true}
+          allowNegative={false}
+        />
+      )}
+    />
+  );
+}
+
+function LineQuantity({ index }: { index: number }) {
+  const { register } = useInvoiceFormContext();
+  return (
+    <TextInput
+      id={`quantity-${index}`}
+      type="number"
+      min={0}
+      inputSize="sm"
+      width="w-2/12"
+      {...register(`lineItems.${index}.quantity`, { valueAsNumber: true })}
+    />
+  );
+}
+
+function LineAmount({ index }: { index: number }) {
+  const { watch } = useInvoiceFormContext();
+  const amount = watch(`lineItems.${index}.amount`);
+
+  const getAmountForDisplay = (amount: number) => {
+    return Money({ amount }).toUnit();
+  };
+
+  return (
+    <NumericFormat
+      displayType="text"
+      className="w-2/12 mt-3"
+      value={getAmountForDisplay(amount)}
+      prefix={"$"}
+      decimalScale={2}
+      fixedDecimalScale={true}
+    />
+  );
+}
+
 export function LineItem({ index, onRemove }: LineItemProps) {
   const {
     register,
     control,
+    watch,
     setValue,
     formState: { errors },
   } = useInvoiceFormContext();
@@ -27,32 +106,45 @@ export function LineItem({ index, onRemove }: LineItemProps) {
   const { isTaxable, updateTotalTax } = useTax();
   const { updateTotalDiscount } = useDiscount();
 
-  const { rate, quantity, amount } = lineItems[index];
+  const { amount } = lineItems[index];
+
+  const rate = watch(`lineItems.${index}.rate`);
+  const quantity = watch(`lineItems.${index}.quantity`);
 
   useEffect(() => {
-    function updateAmount(rate: string, quantity: number) {
-      let amount = parseFloat(rate || "0") * (quantity || 0);
-      setValue(`lineItems.${index}.amount`, amount.toString());
-    }
-    function updateSubtotal() {
-      const subtotal = lineItems
-        .reduce((acc, prev) => acc + parseFloat(prev.amount), 0)
-        .toString();
-      setValue("balance.subtotal", subtotal);
-    }
-    updateAmount(rate, quantity);
-    updateSubtotal();
-    updateTotalDiscount();
-    updateTotalTax();
-  }, [
-    index,
-    lineItems,
-    quantity,
-    rate,
-    setValue,
-    updateTotalDiscount,
-    updateTotalTax,
-  ]);
+    const updateAmount = () => {
+      console.log("HELO");
+      const calculatedAmount = Money({ amount: rate }).multiply(quantity);
+      setValue(`lineItems.${index}.amount`, calculatedAmount.getAmount());
+    };
+
+    updateAmount();
+  }, [index, quantity, rate, setValue]);
+  // TODO: MOVE these somewhere else
+  // useEffect(() => {
+  //   function updateAmount(rate: string, quantity: number) {
+  //     let amount = parseFloat(rate || "0") * (quantity || 0);
+  //     // setValue(`lineItems.${index}.amount`, amount.toString());
+  //   }
+  //   function updateSubtotal() {
+  //     const subtotal = lineItems
+  //       .reduce((acc, prev) => acc + parseFloat(prev.amount), 0)
+  //       .toString();
+  //     setValue("balance.subtotal", subtotal);
+  //   }
+  //   // updateAmount(rate, quantity);
+  //   updateSubtotal();
+  //   updateTotalDiscount();
+  //   updateTotalTax();
+  // }, [
+  //   index,
+  //   lineItems,
+  //   quantity,
+  //   rate,
+  //   setValue,
+  //   updateTotalDiscount,
+  //   updateTotalTax,
+  // ]);
 
   return (
     <div className="relative flex gap-4 py-2 pl-8 border-b border-gray-300">
@@ -89,8 +181,30 @@ export function LineItem({ index, onRemove }: LineItemProps) {
           {...register(`lineItems.${index}.details`)}
         />
       </div>
+      <LineRate index={index} />
+      <LineQuantity index={index} />
+      <LineAmount index={index} />
 
-      <Controller
+      {isTaxable ? (
+        <div className="w-1/12 mt-3">
+          <input
+            type="checkbox"
+            className="checkbox"
+            {...register(`lineItems.${index}.taxable`, {
+              onChange() {
+                updateTotalTax();
+              },
+            })}
+            defaultChecked={isTaxable}
+          />
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+{
+  /* RATE: <Controller
         control={control}
         name={`lineItems.${index}.rate`}
         render={({ field: { name, ref, onChange, value } }) => (
@@ -114,8 +228,11 @@ export function LineItem({ index, onRemove }: LineItemProps) {
             allowNegative={false}
           />
         )}
-      />
-      <TextInput
+      /> */
+}
+
+{
+  /* Rate : <TextInput
         id={`quantity-${index}`}
         type="number"
         min={0}
@@ -129,24 +246,7 @@ export function LineItem({ index, onRemove }: LineItemProps) {
             }
           },
         })}
-      />
-
-      <p className="w-2/12 mt-3 amount">{formatCurrency(amount)}</p>
-
-      {isTaxable ? (
-        <div className="w-1/12 mt-3">
-          <input
-            type="checkbox"
-            className="checkbox"
-            {...register(`lineItems.${index}.taxable`, {
-              onChange() {
-                updateTotalTax();
-              },
-            })}
-            defaultChecked={isTaxable}
-          />
-        </div>
-      ) : null}
-    </div>
-  );
+      /> */
 }
+
+//   <p className="w-2/12 mt-3 amount">{formatCurrency(amount)}</p>

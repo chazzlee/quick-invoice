@@ -29,15 +29,15 @@ export function InvoiceAside() {
     control,
     getValues,
     resetField,
+    trigger,
     formState: { errors },
   } = useInvoiceFormContext();
-  const taxRateInput = register("tax.rate");
 
   const { lineItems, shipping } = useInvoiceFormValues();
   const { replace } = useInvoiceFieldArray();
   const { taxRate, isTaxable, updateTotalTax } = useTax();
 
-  const { isFlatDiscount, isPercentageDiscount, discountRate } = useDiscount();
+  const { isFlatDiscount, isPercentageDiscount } = useDiscount();
   const isFlatShipping = shipping.kind === "flat_amount";
   const isPercentageShipping = shipping.kind === "percent";
 
@@ -120,11 +120,7 @@ export function InvoiceAside() {
           <FormControl id="discount" label="Type">
             <SelectInput
               selectOptions={selectDiscountTypes}
-              {...register("discount.kind", {
-                onChange(event: ChangeEvent<HTMLSelectElement>) {
-                  // resetField("discount.rate");
-                },
-              })}
+              {...register("discount.kind")}
             />
           </FormControl>
 
@@ -205,7 +201,13 @@ export function InvoiceAside() {
           <FormControl id="shipping-type" label="Shipping">
             <SelectInput
               selectOptions={selectShippingTypes}
-              {...register("shipping.kind")}
+              {...register("shipping.kind", {
+                onChange(event) {
+                  if (event.target.value === "no_shipping") {
+                    resetField("shipTo");
+                  }
+                },
+              })}
             />
           </FormControl>
 

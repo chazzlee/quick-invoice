@@ -42,10 +42,13 @@ export const generalDetailsSchema = z.object({
 const lineItemSchema = z.object({
   description: z.string().min(1, { message: "Item description is required" }),
   details: z.string(),
-  rate: z.string().regex(ONLY_DIGITS_REGEX).default(NO_LINE_ITEM_RATE),
-  quantity: z.number().default(1),
-  amount: z.string().regex(ONLY_DIGITS_REGEX).default(NO_AMOUNT),
+  rate: z.number(),
+  quantity: z.number(),
+  amount: z.number(),
   taxable: z.boolean().default(false),
+  // rate: z.string().regex(ONLY_DIGITS_REGEX).default(NO_LINE_ITEM_RATE),
+  // quantity: z.number().default(1),
+  // amount: z.string().regex(ONLY_DIGITS_REGEX).default(NO_AMOUNT),
 });
 
 export const invoiceFormSchema = z.object({
@@ -67,6 +70,7 @@ export const invoiceFormSchema = z.object({
     subtotal: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
     totalTax: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
     totalDiscount: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
+    totalShipping: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
     total: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
     balanceDue: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
   }),
@@ -101,7 +105,7 @@ export const invoiceFormSchema = z.object({
     }),
     z.object({
       kind: z.literal("free"),
-      rate: z.literal(NO_SHIPPING_FLAT),
+      rate: z.literal("FREE"),
     }),
     z.object({
       kind: z.literal("flat_amount"),

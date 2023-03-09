@@ -18,6 +18,7 @@ export function InvoiceForm() {
   const {
     handleSubmit,
     getValues,
+    watch,
     formState: { isValid, errors },
   } = useInvoiceFormContext();
   const router = useRouter();
@@ -47,7 +48,7 @@ export function InvoiceForm() {
 
       <div className="grid grid-cols-2 gap-8">
         <InvoiceDetails />
-        <ShippingDetails />
+        {watch("shipping.kind") === "no_shipping" ? null : <ShippingDetails />}
       </div>
 
       <LineItems />
