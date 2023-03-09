@@ -2,96 +2,19 @@ import { useEffect } from "react";
 import { Textarea, TextInput } from "@/components/Inputs";
 import { useInvoiceFormValues } from "@/features/invoices/hooks/useInvoiceFormValues";
 import { useInvoiceFormContext } from "@/features/invoices/hooks/useInvoiceFormContext";
-import { formatCurrency } from "@/utils/formatCurrency";
 import { useTax } from "@/features/invoices/hooks/useTax";
 import { useDiscount } from "@/features/invoices/hooks/useDiscount";
 import { NumericFormat } from "react-number-format";
-import { Controller } from "react-hook-form";
 import Money from "dinero.js";
+import { replaceNaNWithZero } from "@/utils/replaceNaNWithZero";
+import { LineRate } from "./LineRate";
+import { LineQuantity } from "./LineQuantity";
+import { LineAmount } from "./LineAmount";
 
 type LineItemProps = {
   readonly index: number;
   onRemove(index: number): void;
 };
-
-const replaceNaNWithZero = (value: unknown) => {
-  if (!value || Number.isNaN(value)) {
-    return 0;
-  }
-  return value as number;
-};
-
-function LineRate({ index }: { index: number }) {
-  const { control, getValues, setValue } = useInvoiceFormContext();
-
-  const getRateForDisplay = (valueInCents: number) => {
-    const value = replaceNaNWithZero(valueInCents);
-    const rateInCents = Money({ amount: value });
-    return rateInCents.toUnit();
-  };
-
-  const getRateInCents = (floatValue: number) => {
-    const value = replaceNaNWithZero(floatValue);
-    const valueInCents = Money({ amount: Math.round(value * 100) });
-    return valueInCents.getAmount();
-  };
-
-  return (
-    <Controller
-      control={control}
-      name={`lineItems.${index}.rate`}
-      render={({ field: { name, ref, onChange, value } }) => (
-        <NumericFormat
-          id={`rate-${index}`}
-          getInputRef={ref}
-          name={name}
-          value={getRateForDisplay(value)}
-          onValueChange={(values) =>
-            onChange(getRateInCents(values.floatValue ?? 0))
-          }
-          className="w-2/12 input input-bordered"
-          decimalScale={2}
-          fixedDecimalScale={true}
-          allowNegative={false}
-        />
-      )}
-    />
-  );
-}
-
-function LineQuantity({ index }: { index: number }) {
-  const { register } = useInvoiceFormContext();
-  return (
-    <TextInput
-      id={`quantity-${index}`}
-      type="number"
-      min={0}
-      inputSize="sm"
-      width="w-2/12"
-      {...register(`lineItems.${index}.quantity`, { valueAsNumber: true })}
-    />
-  );
-}
-
-function LineAmount({ index }: { index: number }) {
-  const { watch } = useInvoiceFormContext();
-  const amount = watch(`lineItems.${index}.amount`);
-
-  const getAmountForDisplay = (amount: number) => {
-    return Money({ amount }).toUnit();
-  };
-
-  return (
-    <NumericFormat
-      displayType="text"
-      className="w-2/12 mt-3"
-      value={getAmountForDisplay(amount)}
-      prefix={"$"}
-      decimalScale={2}
-      fixedDecimalScale={true}
-    />
-  );
-}
 
 export function LineItem({ index, onRemove }: LineItemProps) {
   const {
@@ -113,19 +36,20 @@ export function LineItem({ index, onRemove }: LineItemProps) {
 
   useEffect(() => {
     const updateAmount = () => {
-      console.log("HELO");
-      const calculatedAmount = Money({ amount: rate }).multiply(quantity);
-      setValue(`lineItems.${index}.amount`, calculatedAmount.getAmount());
+      console.log({ rate, quantity });
+      try {
+        const calculatedAmount = Money({ amount: rate }).multiply(quantity);
+        setValue(`lineItems.${index}.amount`, calculatedAmount.getAmount());
+      } catch (ex) {
+        console.error(ex);
+      }
     };
 
     updateAmount();
   }, [index, quantity, rate, setValue]);
+
   // TODO: MOVE these somewhere else
   // useEffect(() => {
-  //   function updateAmount(rate: string, quantity: number) {
-  //     let amount = parseFloat(rate || "0") * (quantity || 0);
-  //     // setValue(`lineItems.${index}.amount`, amount.toString());
-  //   }
   //   function updateSubtotal() {
   //     const subtotal = lineItems
   //       .reduce((acc, prev) => acc + parseFloat(prev.amount), 0)
@@ -248,5 +172,3 @@ export function LineItem({ index, onRemove }: LineItemProps) {
         })}
       /> */
 }
-
-//   <p className="w-2/12 mt-3 amount">{formatCurrency(amount)}</p>

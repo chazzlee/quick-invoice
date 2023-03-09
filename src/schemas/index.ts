@@ -42,13 +42,10 @@ export const generalDetailsSchema = z.object({
 const lineItemSchema = z.object({
   description: z.string().min(1, { message: "Item description is required" }),
   details: z.string(),
-  rate: z.number(),
-  quantity: z.number(),
-  amount: z.number(),
+  rate: z.number().default(0),
+  quantity: z.number().default(0),
+  amount: z.number().default(0),
   taxable: z.boolean().default(false),
-  // rate: z.string().regex(ONLY_DIGITS_REGEX).default(NO_LINE_ITEM_RATE),
-  // quantity: z.number().default(1),
-  // amount: z.string().regex(ONLY_DIGITS_REGEX).default(NO_AMOUNT),
 });
 
 export const invoiceFormSchema = z.object({
