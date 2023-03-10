@@ -64,13 +64,21 @@ export const invoiceFormSchema = z.object({
     }),
   }),
   balance: z.object({
-    subtotal: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
-    totalTax: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
-    totalDiscount: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
-    totalShipping: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
-    total: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
-    balanceDue: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
+    subtotal: z.number().default(0),
+    totalTax: z.number().default(0),
+    totalDiscount: z.number().default(0),
+    totalShipping: z.number().default(0),
+    total: z.number().default(0),
+    balanceDue: z.number().default(0),
   }),
+  // balance: z.object({
+  //   subtotal: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
+  //   totalTax: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
+  //   totalDiscount: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
+  //   totalShipping: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
+  //   total: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
+  //   balanceDue: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
+  // }),
   tax: z.discriminatedUnion("kind", [
     z.object({
       kind: z.literal("no_tax"),

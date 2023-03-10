@@ -1,14 +1,16 @@
 import { NO_DISCOUNT_RATE, NO_TAX_RATE, NO_TOTAL } from "@/schemas";
 import { convertPercentageToFloat } from "@/utils/convertPercentageToFloat";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { amountToUnit } from "@/utils/money";
 import { useEffect } from "react";
+import { NumericFormat } from "react-number-format";
 import { useDiscount } from "../../hooks/useDiscount";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
 import { useInvoiceFormValues } from "../../hooks/useInvoiceFormValues";
 import { useTax } from "../../hooks/useTax";
 
 export function BalanceDetails() {
-  const { setValue } = useInvoiceFormContext();
+  const { watch, setValue, getValues } = useInvoiceFormContext();
   const { balance, shipping } = useInvoiceFormValues();
   const {
     subtotal,
@@ -22,43 +24,49 @@ export function BalanceDetails() {
   const { isDiscountable, isPercentageDiscount, discountRate } = useDiscount();
   const isShippable = shipping.kind !== "no_shipping";
 
-  useEffect(() => {
-    setValue(
-      "balance.total",
-      `${
-        parseFloat(subtotal) +
-        parseFloat(totalTax) -
-        parseFloat(totalDiscount) +
-        parseFloat(shipping.rate)
-      }`
-    );
-    setValue("balance.balanceDue", total);
-  }, [setValue, shipping.rate, subtotal, total, totalDiscount, totalTax]);
+  // useEffect(() => {
+  //   setValue(
+  //     "balance.total",
+  //     `${
+  //       parseFloat(subtotal) +
+  //       parseFloat(totalTax) -
+  //       parseFloat(totalDiscount) +
+  //       parseFloat(shipping.rate)
+  //     }`
+  //   );
+  //   setValue("balance.balanceDue", total);
+  // }, [setValue, shipping.rate, subtotal, total, totalDiscount, totalTax]);
 
   // TODO: move out -- need to update blaance after select change etc
-  useEffect(() => {
-    function updateTotalShipping() {
-      if (shipping.kind === "flat_amount") {
-        setValue("balance.totalShipping", shipping.rate);
-      } else if (shipping.kind === "percent") {
-        const shippingPercentage = convertPercentageToFloat(shipping.rate);
-        const totalShipping = parseFloat(subtotal) * shippingPercentage;
-        setValue("balance.totalShipping", totalShipping.toString());
-      } else if (shipping.kind === "free") {
-        setValue("balance.totalShipping", "FREE");
-      } else {
-        setValue("balance.totalShipping", NO_TOTAL);
-      }
-    }
-    updateTotalShipping();
-  }, [setValue, shipping.kind, shipping.rate, subtotal]);
+  // useEffect(() => {
+  //   function updateTotalShipping() {
+  //     if (shipping.kind === "flat_amount") {
+  //       setValue("balance.totalShipping", shipping.rate);
+  //     } else if (shipping.kind === "percent") {
+  //       const shippingPercentage = convertPercentageToFloat(shipping.rate);
+  //       const totalShipping = parseFloat(subtotal) * shippingPercentage;
+  //       setValue("balance.totalShipping", totalShipping.toString());
+  //     } else if (shipping.kind === "free") {
+  //       setValue("balance.totalShipping", "FREE");
+  //     } else {
+  //       setValue("balance.totalShipping", NO_TOTAL);
+  //     }
+  //   }
+  //   updateTotalShipping();
+  // }, [setValue, shipping.kind, shipping.rate, subtotal]);
 
   return (
     <div className="grid grid-cols-2 gap-8 pt-4">
       <div className="col-start-2">
         <div className="flex justify-between w-1/2">
           <p>Subtotal</p>
-          <p>{formatCurrency(subtotal)}</p>
+          <NumericFormat
+            displayType="text"
+            value={amountToUnit(subtotal)}
+            prefix={"$"}
+            decimalScale={2}
+            fixedDecimalScale={true}
+          />
         </div>
         {isDiscountable ? (
           <div className="flex justify-between w-1/2">
@@ -66,7 +74,8 @@ export function BalanceDetails() {
               Discount{" "}
               {isPercentageDiscount && `(${discountRate || NO_DISCOUNT_RATE})`}
             </p>
-            <p>{formatCurrency(parseFloat(totalDiscount) * -1)}</p>
+            <p>TODO: total discount</p>
+            {/* <p>{formatCurrency(parseFloat(totalDiscount) * -1)}</p> */}
           </div>
         ) : null}
         {isTaxable ? (

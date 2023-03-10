@@ -10,6 +10,7 @@ import { replaceNaNWithZero } from "@/utils/replaceNaNWithZero";
 import { LineRate } from "./LineRate";
 import { LineQuantity } from "./LineQuantity";
 import { LineAmount } from "./LineAmount";
+import { LineTaxCheckbox } from "./LineTaxCheckbox";
 
 type LineItemProps = {
   readonly index: number;
@@ -19,7 +20,6 @@ type LineItemProps = {
 export function LineItem({ index, onRemove }: LineItemProps) {
   const {
     register,
-    control,
     watch,
     setValue,
     formState: { errors },
@@ -29,46 +29,51 @@ export function LineItem({ index, onRemove }: LineItemProps) {
   const { isTaxable, updateTotalTax } = useTax();
   const { updateTotalDiscount } = useDiscount();
 
-  const { amount } = lineItems[index];
-
   const rate = watch(`lineItems.${index}.rate`);
   const quantity = watch(`lineItems.${index}.quantity`);
 
   useEffect(() => {
-    const updateAmount = () => {
-      console.log({ rate, quantity });
+    function updateLineAmount(): void {
       try {
         const calculatedAmount = Money({ amount: rate }).multiply(quantity);
         setValue(`lineItems.${index}.amount`, calculatedAmount.getAmount());
       } catch (ex) {
         console.error(ex);
       }
-    };
+    }
 
-    updateAmount();
-  }, [index, quantity, rate, setValue]);
+    function updateSubtotal(): void {
+      try {
+        const subtotal = lineItems.reduce((acc, prev) => {
+          return acc.add(Money({ amount: prev.amount }));
+        }, Money({ amount: 0 }));
 
-  // TODO: MOVE these somewhere else
+        setValue("balance.subtotal", subtotal.getAmount());
+      } catch (ex) {
+        console.error(ex);
+      }
+    }
+
+    updateLineAmount();
+    updateSubtotal();
+    updateTotalTax();
+    updateTotalDiscount();
+  }, [
+    index,
+    lineItems,
+    quantity,
+    rate,
+    setValue,
+    updateTotalDiscount,
+    updateTotalTax,
+  ]);
+
+  // TODO:
+
   // useEffect(() => {
-  //   function updateSubtotal() {
-  //     const subtotal = lineItems
-  //       .reduce((acc, prev) => acc + parseFloat(prev.amount), 0)
-  //       .toString();
-  //     setValue("balance.subtotal", subtotal);
-  //   }
-  //   // updateAmount(rate, quantity);
-  //   updateSubtotal();
-  //   updateTotalDiscount();
-  //   updateTotalTax();
-  // }, [
-  //   index,
-  //   lineItems,
-  //   quantity,
-  //   rate,
-  //   setValue,
-  //   updateTotalDiscount,
-  //   updateTotalTax,
-  // ]);
+  //   // updateTotalDiscount();
+  //   // updateTotalTax();
+  // }, [setValue, index, lineItems, quantity, rate]);
 
   return (
     <div className="relative flex gap-4 py-2 pl-8 border-b border-gray-300">
@@ -110,65 +115,12 @@ export function LineItem({ index, onRemove }: LineItemProps) {
       <LineAmount index={index} />
 
       {isTaxable ? (
-        <div className="w-1/12 mt-3">
-          <input
-            type="checkbox"
-            className="checkbox"
-            {...register(`lineItems.${index}.taxable`, {
-              onChange() {
-                updateTotalTax();
-              },
-            })}
-            defaultChecked={isTaxable}
-          />
-        </div>
+        <LineTaxCheckbox
+          index={index}
+          isTaxable={isTaxable}
+          onCheck={updateTotalTax}
+        />
       ) : null}
     </div>
   );
-}
-
-{
-  /* RATE: <Controller
-        control={control}
-        name={`lineItems.${index}.rate`}
-        render={({ field: { name, ref, onChange, value } }) => (
-          <NumericFormat
-            id={`rate-${index}`}
-            getInputRef={ref}
-            name={name}
-            value={value}
-            onValueChange={(values) => {
-              onChange(values.formattedValue);
-            }}
-            onBlur={(e) => {
-              if (!e.target.value) {
-                setValue(`lineItems.${index}.rate`, NO_LINE_ITEM_RATE);
-              }
-            }}
-            className="w-2/12 input input-bordered"
-            decimalScale={2}
-            fixedDecimalScale={true}
-            placeholder={NO_LINE_ITEM_RATE}
-            allowNegative={false}
-          />
-        )}
-      /> */
-}
-
-{
-  /* Rate : <TextInput
-        id={`quantity-${index}`}
-        type="number"
-        min={0}
-        inputSize="sm"
-        width="w-2/12"
-        {...register(`lineItems.${index}.quantity`, {
-          valueAsNumber: true,
-          onBlur(event) {
-            if (!event.target.value) {
-              setValue(`lineItems.${index}.quantity`, 1);
-            }
-          },
-        })}
-      /> */
 }

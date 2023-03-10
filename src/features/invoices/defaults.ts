@@ -31,14 +31,6 @@ export const defaultLineItem: LineItemSchema = {
   amount: 0,
   taxable: false,
 };
-// export const defaultLineItem: LineItemSchema = {
-//   description: "",
-//   details: "",
-//   rate: NO_LINE_ITEM_RATE,
-//   quantity: 1,
-//   amount: NO_AMOUNT,
-//   taxable: false,
-// };
 
 export const defaultInvoice: InvoiceFormSchema = {
   title: "Invoice",
@@ -68,12 +60,21 @@ export const defaultInvoice: InvoiceFormSchema = {
   },
   lineItems: [defaultLineItem],
   balance: {
-    subtotal: NO_TOTAL,
-    total: NO_TOTAL,
-    totalTax: NO_TOTAL,
-    totalDiscount: NO_TOTAL,
-    totalShipping: NO_TOTAL,
-    balanceDue: NO_TOTAL,
+    subtotal: 0,
+    total: 0,
+    totalTax: 0,
+    totalDiscount: 0,
+    totalShipping: 0,
+    balanceDue: 0,
   },
   shipTo: structuredClone(defaultGeneralDetails),
 };
+
+// balance: {
+//   subtotal: NO_TOTAL,
+//   total: NO_TOTAL,
+//   totalTax: NO_TOTAL,
+//   totalDiscount: NO_TOTAL,
+//   totalShipping: NO_TOTAL,
+//   balanceDue: NO_TOTAL,
+// },
