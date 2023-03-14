@@ -21,17 +21,8 @@ export const TERMS_TYPE = [
 
 export type TermsType = typeof TERMS_TYPE[number];
 
-export const TAX_TYPES = [
-  "on_total",
-  "no_tax",
-  "deducted",
-  "per_item",
-] as const;
+export const TAX_TYPES = ["on_total", "none", "deducted", "per_item"] as const;
 export type TaxType = typeof TAX_TYPES[number];
 
-export const DISCOUNT_TYPES = [
-  "no_discount",
-  "percent",
-  "flat_amount",
-] as const;
+export const DISCOUNT_TYPES = ["none", "percent", "flat_amount"] as const;
 export type DiscountType = typeof DISCOUNT_TYPES[number];

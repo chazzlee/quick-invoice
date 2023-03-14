@@ -28,11 +28,11 @@ export const selectTaxTypes: SelectOption[] = [
   { label: "On total", value: "on_total" },
   { label: "Deducted", value: "deducted" },
   { label: "Per item", value: "per_item" },
-  { label: "None", value: "no_tax" },
+  { label: "None", value: "none" },
 ];
 
 export const selectDiscountTypes: SelectOption[] = [
-  { label: "None", value: "no_discount" },
+  { label: "None", value: "none" },
   { label: "Percent", value: "percent" },
   { label: "Flat amount", value: "flat_amount" },
 ];

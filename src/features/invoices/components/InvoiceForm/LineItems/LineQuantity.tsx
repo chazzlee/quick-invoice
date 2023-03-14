@@ -2,7 +2,7 @@ import { TextInput } from "@/components/Inputs";
 import { useInvoiceFormContext } from "@/features/invoices/hooks/useInvoiceFormContext";
 import { replaceNaNWithZero } from "@/utils/replaceNaNWithZero";
 
-type LineQuantityProps = { readonly index: number };
+type LineQuantityProps = Readonly<{ index: number }>;
 
 export function LineQuantity({ index }: LineQuantityProps) {
   const { register } = useInvoiceFormContext();

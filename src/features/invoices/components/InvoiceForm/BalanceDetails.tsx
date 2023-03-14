@@ -1,39 +1,42 @@
-import { NO_DISCOUNT_RATE, NO_TAX_RATE, NO_TOTAL } from "@/schemas";
-import { convertPercentageToFloat } from "@/utils/convertPercentageToFloat";
 import { formatCurrency } from "@/utils/formatCurrency";
-import { amountToUnit } from "@/utils/money";
 import { useEffect } from "react";
 import { NumericFormat } from "react-number-format";
 import { useDiscount } from "../../hooks/useDiscount";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
-import { useInvoiceFormValues } from "../../hooks/useInvoiceFormValues";
+import { useInvoiceWatchOne } from "../../hooks/useInvoiceWatchOne";
 import { useTax } from "../../hooks/useTax";
+import { Currency } from "@/components/Inputs/Currency";
+import Money from "dinero.js";
+import { valueAsPercentage } from "@/utils/formats";
 
 export function BalanceDetails() {
-  const { watch, setValue, getValues } = useInvoiceFormContext();
-  const { balance, shipping } = useInvoiceFormValues();
-  const {
-    subtotal,
-    totalDiscount,
-    totalTax,
-    total,
-    balanceDue,
-    totalShipping,
-  } = balance;
+  const { setValue } = useInvoiceFormContext();
+
+  const subtotal = useInvoiceWatchOne("balance.subtotal");
+  const totalDiscount = useInvoiceWatchOne("balance.totalDiscount");
+  const totalTax = useInvoiceWatchOne("balance.totalTax");
+  const total = useInvoiceWatchOne("balance.total");
+  const balanceDue = useInvoiceWatchOne("balance.balanceDue");
+  // const totalShipping = useInvoiceWatchOne('balance.totalShipping') //TODO:
+
+  const isShippable = useInvoiceWatchOne("shipping.kind") !== "no_shipping";
+
   const { taxRate, isTaxable } = useTax();
   const { isDiscountable, isPercentageDiscount, discountRate } = useDiscount();
-  const isShippable = shipping.kind !== "no_shipping";
+
+  useEffect(() => {
+    function updateTotal() {
+      // TODO: include shipping
+      const total = Money({ amount: subtotal })
+        .add(Money({ amount: Math.round(totalTax) }))
+        .add(Money({ amount: Math.round(totalDiscount) }));
+      setValue("balance.total", total.getAmount());
+    }
+
+    updateTotal();
+  }, [setValue, subtotal, totalDiscount, totalTax]);
 
   // useEffect(() => {
-  //   setValue(
-  //     "balance.total",
-  //     `${
-  //       parseFloat(subtotal) +
-  //       parseFloat(totalTax) -
-  //       parseFloat(totalDiscount) +
-  //       parseFloat(shipping.rate)
-  //     }`
-  //   );
   //   setValue("balance.balanceDue", total);
   // }, [setValue, shipping.rate, subtotal, total, totalDiscount, totalTax]);
 
@@ -55,47 +58,67 @@ export function BalanceDetails() {
   //   updateTotalShipping();
   // }, [setValue, shipping.kind, shipping.rate, subtotal]);
 
+  //COMEBACK TOTHISREMOVE
   return (
     <div className="grid grid-cols-2 gap-8 pt-4">
       <div className="col-start-2">
         <div className="flex justify-between w-1/2">
           <p>Subtotal</p>
-          <NumericFormat
-            displayType="text"
-            value={amountToUnit(subtotal)}
-            prefix={"$"}
-            decimalScale={2}
-            fixedDecimalScale={true}
-          />
+          <Currency amount={subtotal} />
         </div>
         {isDiscountable ? (
           <div className="flex justify-between w-1/2">
             <p>
-              Discount{" "}
-              {isPercentageDiscount && `(${discountRate || NO_DISCOUNT_RATE})`}
+              <span>Discount </span>
+              {isPercentageDiscount ? (
+                <span>
+                  (
+                  <NumericFormat
+                    displayType="text"
+                    value={valueAsPercentage(discountRate)}
+                    suffix={"%"}
+                    decimalScale={2}
+                    fixedDecimalScale={true}
+                  />
+                  )
+                </span>
+              ) : null}
             </p>
-            <p>TODO: total discount</p>
-            {/* <p>{formatCurrency(parseFloat(totalDiscount) * -1)}</p> */}
+            <Currency amount={totalDiscount} />
           </div>
         ) : null}
         {isTaxable ? (
           <div className="flex justify-between w-1/2">
-            <p>Tax ({taxRate || NO_TAX_RATE})</p>
-            <p>{formatCurrency(totalTax)}</p>
+            <p>
+              <span>Tax </span>
+              <span>
+                (
+                <NumericFormat
+                  displayType="text"
+                  value={valueAsPercentage(taxRate)}
+                  suffix={"%"}
+                  decimalScale={3}
+                  fixedDecimalScale={true}
+                />
+                )
+              </span>
+            </p>
+            <Currency amount={totalTax} />
           </div>
         ) : null}
         <div className="flex justify-between w-1/2">
           <p>Total</p>
-          <p>{formatCurrency(total)}</p>
+          <Currency amount={total} />
         </div>
         {isShippable ? (
           <div className="flex justify-between w-1/2">
             <p>Shipping</p>
-            <p>
+            {/* <p>
+            ///TODO:
               {shipping.kind === "free"
                 ? totalShipping
                 : formatCurrency(totalShipping)}
-            </p>
+            </p> */}
           </div>
         ) : null}
         <div className="flex justify-between w-1/2">

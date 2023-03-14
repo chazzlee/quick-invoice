@@ -1,10 +1,10 @@
 import { useInvoiceFormContext } from "@/features/invoices/hooks/useInvoiceFormContext";
 
-type LineTaxCheckboxProps = {
-  readonly index: number;
-  readonly isTaxable: boolean;
-  readonly onCheck: () => void;
-};
+type LineTaxCheckboxProps = Readonly<{
+  index: number;
+  isTaxable: boolean;
+  onCheck: () => void;
+}>;
 
 export function LineTaxCheckbox({
   index,

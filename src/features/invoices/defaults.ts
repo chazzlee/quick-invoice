@@ -3,12 +3,7 @@ import {
   GeneralDetailsSchema,
   InvoiceFormSchema,
   LineItemSchema,
-  NO_AMOUNT,
-  NO_DISCOUNT_FLAT,
-  NO_LINE_ITEM_RATE,
   NO_SHIPPING_FLAT,
-  NO_TAX_RATE,
-  NO_TOTAL,
 } from "@/schemas";
 
 export const defaultGeneralDetails: GeneralDetailsSchema = {
@@ -47,12 +42,12 @@ export const defaultInvoice: InvoiceFormSchema = {
     },
   },
   tax: {
-    kind: "no_tax",
-    rate: NO_TAX_RATE,
+    kind: "none",
+    rate: 0,
   },
   discount: {
-    kind: "no_discount",
-    rate: NO_DISCOUNT_FLAT,
+    kind: "none",
+    rate: 0,
   },
   shipping: {
     kind: "no_shipping",
@@ -69,12 +64,3 @@ export const defaultInvoice: InvoiceFormSchema = {
   },
   shipTo: structuredClone(defaultGeneralDetails),
 };
-
-// balance: {
-//   subtotal: NO_TOTAL,
-//   total: NO_TOTAL,
-//   totalTax: NO_TOTAL,
-//   totalDiscount: NO_TOTAL,
-//   totalShipping: NO_TOTAL,
-//   balanceDue: NO_TOTAL,
-// },

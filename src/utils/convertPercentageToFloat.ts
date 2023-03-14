@@ -1,9 +1,8 @@
-// TODO:
-export function convertPercentageToFloat(formattedPercentage: string): number {
-  let percentage = parseFloat(formattedPercentage);
-  if (Number.isNaN(percentage)) {
-    percentage = 0;
+// TODO: delete?? not using anymore
+export function convertPercentageToFloat(value: number): number {
+  if (Number.isNaN(value)) {
+    value = 0;
   }
 
-  return percentage / 100;
+  return value / 100;
 }

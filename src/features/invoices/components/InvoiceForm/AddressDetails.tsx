@@ -1,13 +1,13 @@
 import { FormControl, SelectInput, TextInput } from "@/components/Inputs";
 import { useEffect } from "react";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
-import { useInvoiceWatchOne } from "../../hooks/useInvoiceFormValues";
+import { useInvoiceWatchOne } from "../../hooks/useInvoiceWatchOne";
 import { selectStates } from "../../selectOptions";
 
 import { NumericFormat, PatternFormat } from "react-number-format";
 import { Controller } from "react-hook-form";
 
-type AddressDetailsProps = { id: "from" | "to" };
+type AddressDetailsProps = Readonly<{ id: "from" | "to" }>;
 
 // TODO: debounce, rethink trigger logic
 export function AddressDetails({ id }: AddressDetailsProps) {

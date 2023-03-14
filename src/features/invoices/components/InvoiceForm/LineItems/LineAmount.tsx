@@ -1,22 +1,10 @@
-import { NumericFormat } from "react-number-format";
-import { useInvoiceFormContext } from "@/features/invoices/hooks/useInvoiceFormContext";
-import { amountToUnit } from "@/utils/money";
+import { Currency } from "@/components/Inputs/Currency";
+import { useInvoiceWatchOne } from "@/features/invoices/hooks/useInvoiceWatchOne";
 
-type LineAmountProps = { readonly index: number };
+type LineAmountProps = Readonly<{ index: number }>;
 
 export function LineAmount({ index }: LineAmountProps) {
-  const { watch } = useInvoiceFormContext();
+  const amount = useInvoiceWatchOne(`lineItems.${index}.amount`);
 
-  const amount = watch(`lineItems.${index}.amount`);
-
-  return (
-    <NumericFormat
-      displayType="text"
-      className="w-2/12 mt-3"
-      value={amountToUnit(amount)}
-      prefix={"$"}
-      decimalScale={2}
-      fixedDecimalScale={true}
-    />
-  );
+  return <Currency className="w-2/12 mt-3" amount={amount} />;
 }

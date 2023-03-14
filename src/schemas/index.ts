@@ -3,12 +3,7 @@ import { z } from "zod";
 
 // FIXME:
 const ONLY_DIGITS_REGEX = /^[-+]?[0-9]+[.]?[0-9]*([eE][-+]?[0-9]+)?$/;
-export const NO_TAX_RATE = "0.000%" as const;
-export const NO_DISCOUNT_RATE = "0.00%" as const;
-export const NO_DISCOUNT_FLAT = "0.00" as const;
-export const NO_LINE_ITEM_RATE = "0.00" as const;
-export const NO_AMOUNT = "0.00" as const;
-export const NO_TOTAL = "0.00" as const;
+//TODO: delete later
 export const NO_SHIPPING_RATE = "0.00%" as const;
 export const NO_SHIPPING_FLAT = "0.00" as const;
 
@@ -71,36 +66,24 @@ export const invoiceFormSchema = z.object({
     total: z.number().default(0),
     balanceDue: z.number().default(0),
   }),
-  // balance: z.object({
-  //   subtotal: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
-  //   totalTax: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
-  //   totalDiscount: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
-  //   totalShipping: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
-  //   total: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
-  //   balanceDue: z.string().regex(ONLY_DIGITS_REGEX).default(NO_TOTAL),
-  // }),
   tax: z.discriminatedUnion("kind", [
     z.object({
-      kind: z.literal("no_tax"),
-      rate: z.literal(NO_TAX_RATE).default(NO_TAX_RATE),
+      kind: z.literal("none"),
+      rate: z.literal(0),
     }),
     z.object({
-      kind: z.enum(["on_total", "per_item", "deducted"]),
-      rate: z.string().endsWith("%").default(NO_TAX_RATE),
+      kind: z.enum(["on_total", "per_item", "deducted"]), //TODO:
+      rate: z.number().default(0),
     }),
   ]),
   discount: z.discriminatedUnion("kind", [
     z.object({
-      kind: z.literal("no_discount"),
-      rate: z.literal(NO_DISCOUNT_FLAT).default(NO_DISCOUNT_FLAT),
+      kind: z.literal("none"),
+      rate: z.literal(0),
     }),
     z.object({
-      kind: z.literal("flat_amount"),
-      rate: z.string().regex(ONLY_DIGITS_REGEX).default(NO_DISCOUNT_FLAT),
-    }),
-    z.object({
-      kind: z.literal("percent"),
-      rate: z.string().endsWith("%").default(NO_DISCOUNT_RATE),
+      kind: z.enum(["flat_amount", "percent"]),
+      rate: z.number().default(0),
     }),
   ]),
   shipping: z.discriminatedUnion("kind", [

@@ -1,9 +1,9 @@
 import { FormControl, TextInput } from "@/components/Inputs";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
 
-type GeneralDetailsProps = {
+type GeneralDetailsProps = Readonly<{
   title: "from" | "to";
-};
+}>;
 
 const generalFields = [
   { name: "name", type: "text", required: true },

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { InvoiceTitle } from "./InvoiceTitle";
 import { CompanyLogo } from "./CompanyLogo";
 import { GeneralDetails } from "./GeneralDetails";
@@ -10,9 +9,6 @@ import { ExtraNotes } from "./ExtraNotes";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
 import { useRouter } from "next/router";
 import { ShippingDetails } from "./ShippingDetails";
-import { useEffect } from "react";
-import { LineItemSchema } from "@/schemas";
-import Money from "dinero.js";
 
 const FROM = "from";
 const TO = "to";

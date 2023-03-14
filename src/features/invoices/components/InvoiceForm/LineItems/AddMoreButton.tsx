@@ -1,6 +1,6 @@
-type AddMoreProps = {
+type AddMoreProps = Readonly<{
   onAddMore(): void;
-};
+}>;
 
 export function AddMoreButton({ onAddMore }: AddMoreProps) {
   return (

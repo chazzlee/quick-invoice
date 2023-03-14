@@ -1,57 +1,45 @@
 import { useEffect } from "react";
 import { Textarea, TextInput } from "@/components/Inputs";
-import { useInvoiceFormValues } from "@/features/invoices/hooks/useInvoiceFormValues";
+import { useInvoiceWatchOne } from "@/features/invoices/hooks/useInvoiceWatchOne";
 import { useInvoiceFormContext } from "@/features/invoices/hooks/useInvoiceFormContext";
 import { useTax } from "@/features/invoices/hooks/useTax";
 import { useDiscount } from "@/features/invoices/hooks/useDiscount";
-import { NumericFormat } from "react-number-format";
 import Money from "dinero.js";
-import { replaceNaNWithZero } from "@/utils/replaceNaNWithZero";
 import { LineRate } from "./LineRate";
 import { LineQuantity } from "./LineQuantity";
 import { LineAmount } from "./LineAmount";
 import { LineTaxCheckbox } from "./LineTaxCheckbox";
 
-type LineItemProps = {
-  readonly index: number;
+type LineItemProps = Readonly<{
+  index: number;
   onRemove(index: number): void;
-};
+}>;
 
 export function LineItem({ index, onRemove }: LineItemProps) {
   const {
     register,
-    watch,
     setValue,
+    getValues,
     formState: { errors },
   } = useInvoiceFormContext();
-  const { lineItems } = useInvoiceFormValues();
 
   const { isTaxable, updateTotalTax } = useTax();
   const { updateTotalDiscount } = useDiscount();
 
-  const rate = watch(`lineItems.${index}.rate`);
-  const quantity = watch(`lineItems.${index}.quantity`);
+  const rate = useInvoiceWatchOne(`lineItems.${index}.rate`);
+  const quantity = useInvoiceWatchOne(`lineItems.${index}.quantity`);
 
   useEffect(() => {
     function updateLineAmount(): void {
-      try {
-        const calculatedAmount = Money({ amount: rate }).multiply(quantity);
-        setValue(`lineItems.${index}.amount`, calculatedAmount.getAmount());
-      } catch (ex) {
-        console.error(ex);
-      }
+      const calculatedAmount = Money({ amount: rate }).multiply(quantity);
+      setValue(`lineItems.${index}.amount`, calculatedAmount.getAmount());
     }
 
     function updateSubtotal(): void {
-      try {
-        const subtotal = lineItems.reduce((acc, prev) => {
-          return acc.add(Money({ amount: prev.amount }));
-        }, Money({ amount: 0 }));
-
-        setValue("balance.subtotal", subtotal.getAmount());
-      } catch (ex) {
-        console.error(ex);
-      }
+      const subtotal = getValues("lineItems").reduce((acc, prev) => {
+        return acc.add(Money({ amount: prev.amount }));
+      }, Money({ amount: 0 }));
+      setValue("balance.subtotal", subtotal.getAmount());
     }
 
     updateLineAmount();
@@ -59,21 +47,14 @@ export function LineItem({ index, onRemove }: LineItemProps) {
     updateTotalTax();
     updateTotalDiscount();
   }, [
+    getValues,
     index,
-    lineItems,
     quantity,
     rate,
     setValue,
     updateTotalDiscount,
     updateTotalTax,
   ]);
-
-  // TODO:
-
-  // useEffect(() => {
-  //   // updateTotalDiscount();
-  //   // updateTotalTax();
-  // }, [setValue, index, lineItems, quantity, rate]);
 
   return (
     <div className="relative flex gap-4 py-2 pl-8 border-b border-gray-300">
@@ -110,6 +91,7 @@ export function LineItem({ index, onRemove }: LineItemProps) {
           {...register(`lineItems.${index}.details`)}
         />
       </div>
+
       <LineRate index={index} />
       <LineQuantity index={index} />
       <LineAmount index={index} />

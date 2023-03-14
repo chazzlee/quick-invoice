@@ -1,33 +1,35 @@
-import { NO_TOTAL } from "@/schemas";
-import { convertPercentageToFloat } from "@/utils/convertPercentageToFloat";
 import { useCallback } from "react";
 import { useInvoiceFormContext } from "./useInvoiceFormContext";
-import { useInvoiceFormValues } from "./useInvoiceFormValues";
+import { useInvoiceWatchOne } from "./useInvoiceWatchOne";
 
 export function useDiscount() {
-  const { setValue } = useInvoiceFormContext();
-  const { discount, balance } = useInvoiceFormValues();
+  const { setValue, getValues } = useInvoiceFormContext();
 
-  const discountType = discount.kind;
-  const discountRate = discount.rate;
-  const isDiscountable = discountType !== "no_discount";
+  const discountType = useInvoiceWatchOne("discount.kind");
+  const discountRate = useInvoiceWatchOne("discount.rate");
+  const isDiscountable = discountType !== "none";
   const isPercentageDiscount = discountType === "percent";
   const isFlatDiscount = discountType === "flat_amount";
 
-  const subtotal = balance.subtotal;
-
   const updateTotalDiscount = useCallback(() => {
-    if (discountType === "flat_amount") {
-      // TODO: NaN
-      setValue("balance.totalDiscount", discountRate);
-    } else if (discountType === "percent") {
-      const discountPercentage = convertPercentageToFloat(discountRate);
-      const totalDiscount = parseFloat(subtotal) * discountPercentage;
-      setValue("balance.totalDiscount", totalDiscount.toString());
-    } else {
-      setValue("balance.totalDiscount", NO_TOTAL);
+    switch (discountType) {
+      case "flat_amount": {
+        setValue("balance.totalDiscount", discountRate * -1);
+        break;
+      }
+      case "percent": {
+        const totalDiscount = getValues("balance.subtotal") * discountRate * -1;
+        setValue("balance.totalDiscount", totalDiscount);
+        break;
+      }
+      case "none": {
+        setValue("balance.totalDiscount", 0);
+        break;
+      }
+      default:
+        throw new Error("Invalid discount type!");
     }
-  }, [discountRate, discountType, setValue, subtotal]);
+  }, [discountRate, discountType, getValues, setValue]);
 
   return {
     discountType,

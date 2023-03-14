@@ -1,11 +1,11 @@
 import { cloneElement, type ReactElement, type ReactNode } from "react";
 
-type FormControlProps = {
+type FormControlProps = Readonly<{
   id: string;
   label: string;
   error?: string;
   children: ReactNode;
-};
+}>;
 
 export function FormControl({ id, label, error, children }: FormControlProps) {
   return (

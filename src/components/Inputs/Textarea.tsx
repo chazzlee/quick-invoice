@@ -1,6 +1,6 @@
 import { type ComponentPropsWithRef, forwardRef } from "react";
 
-type TextareaProps = ComponentPropsWithRef<"textarea"> & {};
+type TextareaProps = Readonly<ComponentPropsWithRef<"textarea"> & {}>;
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   function Textarea({ ...rest }, ref) {

@@ -1,11 +1,13 @@
 import type { SelectOption } from "@/features/invoices/selectOptions";
 import { type ComponentPropsWithRef, forwardRef } from "react";
 
-type SelectInputProps = ComponentPropsWithRef<"select"> & {
-  selectOptions: SelectOption[];
-  classes?: string;
-  defaultLabel?: string;
-};
+type SelectInputProps = Readonly<
+  ComponentPropsWithRef<"select"> & {
+    selectOptions: SelectOption[];
+    classes?: string;
+    defaultLabel?: string;
+  }
+>;
 
 // TODO: default selected
 export const SelectInput = forwardRef<HTMLSelectElement, SelectInputProps>(
