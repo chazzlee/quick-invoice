@@ -1,30 +1,54 @@
-import { type ChangeEvent } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { Controller } from "react-hook-form";
 import { PatternFormat } from "react-number-format";
 import { FormControl, SelectInput, TextInput } from "@/components/Inputs";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
 import { selectStates } from "../../selectOptions";
+import { useInvoiceWatchOne } from "../../hooks/useInvoiceWatchOne";
 
 export function ShippingDetails() {
   const {
     register,
     control,
     setValue,
-    getValues,
     resetField,
     formState: { errors },
   } = useInvoiceFormContext();
 
+  const [isSameAsBillTo, setIsSameAsBillTo] = useState(false);
   const handleToggle = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      setValue("shipTo.name", getValues("to.name"));
-      setValue("shipTo.email", getValues("to.email"));
-      setValue("shipTo.phone", getValues("to.phone"));
-      setValue("shipTo.address", getValues("to.address"));
-    } else {
-      resetField("shipping");
-    }
+    setIsSameAsBillTo(event.target.checked);
   };
+
+  const name = useInvoiceWatchOne("to.name");
+  const email = useInvoiceWatchOne("to.email");
+  const phone = useInvoiceWatchOne("to.phone");
+  const street = useInvoiceWatchOne("to.address.street");
+  const city = useInvoiceWatchOne("to.address.city");
+  const state = useInvoiceWatchOne("to.address.state");
+  const zipCode = useInvoiceWatchOne("to.address.zipCode");
+
+  useEffect(() => {
+    if (isSameAsBillTo) {
+      setValue("shipTo.name", name);
+      setValue("shipTo.email", email);
+      setValue("shipTo.phone", phone);
+      setValue("shipTo.address.street", street);
+      setValue("shipTo.address.city", city);
+      setValue("shipTo.address.state", state);
+      setValue("shipTo.address.zipCode", zipCode);
+    }
+  }, [
+    city,
+    email,
+    isSameAsBillTo,
+    name,
+    phone,
+    setValue,
+    state,
+    street,
+    zipCode,
+  ]);
 
   return (
     <div className="shipping">
