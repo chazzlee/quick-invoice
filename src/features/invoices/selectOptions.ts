@@ -38,7 +38,7 @@ export const selectDiscountTypes: SelectOption[] = [
 ];
 
 export const selectShippingTypes: SelectOption[] = [
-  { label: "None", value: "no_shipping" },
+  { label: "None", value: "none" },
   { label: "Free", value: "free" },
   { label: "Flat amount", value: "flat_amount" },
   { label: "Percent", value: "percent" },

@@ -1,6 +1,6 @@
+import { FieldPath } from "react-hook-form";
 import type { ReactNode, ChangeEvent } from "react";
 import type { SelectOption } from "../../selectOptions";
-import { FieldPath } from "react-hook-form";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
 import { InvoiceFormSchema } from "@/schemas";
 import { FormControl, SelectInput } from "@/components/Inputs";

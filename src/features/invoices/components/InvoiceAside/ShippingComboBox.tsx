@@ -1,66 +1,66 @@
-import type { ChangeEvent } from "react";
+import { type ChangeEvent } from "react";
 import { FormControl } from "@/components/Inputs";
-import { NumberInput } from "@/components/Inputs/NumberInput";
+import { Controller } from "react-hook-form";
+import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
+import { useShipping } from "../../hooks/useShipping";
+import { selectShippingTypes } from "../../selectOptions";
+import { ComboBox } from "./ComboBox";
 import { PercentageInput } from "@/components/Inputs/PercentageInput";
+import { NumberInput } from "@/components/Inputs/NumberInput";
+import { ShippingType } from "../../types";
 import {
   valueInCentsFromPercentage,
   valueInPercentageFloatFromCents,
 } from "@/utils/formats";
-import { Controller } from "react-hook-form";
-import { useDiscount } from "../../hooks/useDiscount";
-import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
-import { selectDiscountTypes } from "../../selectOptions";
-import type { DiscountType } from "../../types";
-import { ComboBox } from "./ComboBox";
 
-export function DiscountComboBox() {
+export function ShippingComboBox() {
   const {
     control,
     setValue,
     formState: { errors },
   } = useInvoiceFormContext();
 
-  const { isFlatDiscount, isPercentageDiscount, discountRate } = useDiscount();
-
+  const { shippingRate, isFlatShipping, isPercentageShipping } = useShipping();
   const onSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    switch (event.target.value as DiscountType) {
+    switch (event.target.value as ShippingType) {
       case "flat_amount": {
-        setValue("discount.rate", valueInCentsFromPercentage(discountRate));
+        setValue("shipping.rate", valueInCentsFromPercentage(shippingRate));
         break;
       }
       case "percent": {
         setValue(
-          "discount.rate",
-          valueInPercentageFloatFromCents(discountRate)
+          "shipping.rate",
+          valueInPercentageFloatFromCents(shippingRate)
         );
         break;
       }
-      case "none": {
-        setValue("discount.rate", 0);
+      case "free":
+      case "none":
+        setValue("shipping.rate", 0);
         break;
-      }
+
       default:
-        throw new Error("Invalid discount type!");
+        throw new Error("Invalid shipping type!");
     }
   };
 
   return (
     <ComboBox
-      id="discount-type"
-      name="discount.kind"
-      title="Discount"
-      selectOptions={selectDiscountTypes}
+      id="shipping-type"
+      name="shipping.kind"
+      title="Shipping"
+      selectOptions={selectShippingTypes}
       onSelectChange={onSelectChange}
     >
-      {isPercentageDiscount && (
+      {isPercentageShipping && (
         <FormControl
-          id="percent"
+          id="shipping-percent"
           label="Percent"
-          error={errors.discount?.rate?.message}
+          error={errors.shipping?.rate?.message}
         >
           <Controller
             control={control}
-            name="discount.rate"
+            name="shipping.rate"
             render={({
               field: { onChange, name, ref, value },
               fieldState: { error },
@@ -69,26 +69,25 @@ export function DiscountComboBox() {
                 ref={ref}
                 name={name}
                 value={value}
-                hasError={!!error}
                 decimalScale={2}
+                hasError={!!error}
                 onChange={onChange}
-                onBlur={() => {
-                  console.log("maybe need to do something?");
-                }}
+                onBlur={() => {}}
               />
             )}
           />
         </FormControl>
       )}
-      {isFlatDiscount && (
+
+      {isFlatShipping && (
         <FormControl
-          id="flat-amount"
+          id="shipping-flat-amount"
           label="Amount"
-          error={errors.discount?.rate?.message}
+          error={errors.shipping?.rate?.message}
         >
           <Controller
             control={control}
-            name="discount.rate"
+            name="shipping.rate"
             render={({
               field: { onChange, name, value, ref },
               fieldState: { error },

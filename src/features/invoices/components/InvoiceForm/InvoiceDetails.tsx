@@ -11,6 +11,7 @@ const getDueDate = (termsType: TermsType, start: Date) => {
     return formatISO(start, { representation: "date" });
   }
   const daysToAdd = parseInt(termsType, 10);
+
   return formatISO(addDays(start, daysToAdd), {
     representation: "date",
   });

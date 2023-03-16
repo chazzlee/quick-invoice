@@ -6,14 +6,3 @@ export function useInvoiceWatchOne<K extends FieldPath<InvoiceFormSchema>>(
 ) {
   return useWatch<InvoiceFormSchema, K>({ name });
 }
-
-// const useInvoiceWatch = useWatch<InvoiceFormSchema>;
-
-// export function useInvoiceFormValues() {
-//   const { getValues } = useInvoiceFormContext();
-
-//   return {
-//     ...useInvoiceWatch(),
-//     ...getValues(),
-//   };
-// }

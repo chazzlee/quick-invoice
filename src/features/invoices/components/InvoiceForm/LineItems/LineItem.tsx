@@ -9,6 +9,7 @@ import { LineRate } from "./LineRate";
 import { LineQuantity } from "./LineQuantity";
 import { LineAmount } from "./LineAmount";
 import { LineTaxCheckbox } from "./LineTaxCheckbox";
+import { useShipping } from "@/features/invoices/hooks/useShipping";
 
 type LineItemProps = Readonly<{
   index: number;
@@ -25,6 +26,7 @@ export function LineItem({ index, onRemove }: LineItemProps) {
 
   const { isTaxable, updateTotalTax } = useTax();
   const { updateTotalDiscount } = useDiscount();
+  const { updateTotalShipping } = useShipping();
 
   const rate = useInvoiceWatchOne(`lineItems.${index}.rate`);
   const quantity = useInvoiceWatchOne(`lineItems.${index}.quantity`);
@@ -46,6 +48,7 @@ export function LineItem({ index, onRemove }: LineItemProps) {
     updateSubtotal();
     updateTotalTax();
     updateTotalDiscount();
+    updateTotalShipping();
   }, [
     getValues,
     index,
@@ -54,6 +57,7 @@ export function LineItem({ index, onRemove }: LineItemProps) {
     setValue,
     updateTotalDiscount,
     updateTotalTax,
+    updateTotalShipping,
   ]);
 
   return (

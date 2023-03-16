@@ -3,11 +3,6 @@ import { z } from "zod";
 
 // FIXME:
 const ONLY_DIGITS_REGEX = /^[-+]?[0-9]+[.]?[0-9]*([eE][-+]?[0-9]+)?$/;
-//TODO: delete later
-export const NO_SHIPPING_RATE = "0.00%" as const;
-export const NO_SHIPPING_FLAT = "0.00" as const;
-
-//TODO: set  defaults for num inputs
 
 export const generalDetailsSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
@@ -88,20 +83,20 @@ export const invoiceFormSchema = z.object({
   ]),
   shipping: z.discriminatedUnion("kind", [
     z.object({
-      kind: z.literal("no_shipping"),
-      rate: z.literal(NO_SHIPPING_FLAT),
+      kind: z.literal("none"),
+      rate: z.literal(0),
     }),
     z.object({
       kind: z.literal("free"),
-      rate: z.literal("FREE"),
+      rate: z.literal(0),
     }),
     z.object({
       kind: z.literal("flat_amount"),
-      rate: z.string().regex(ONLY_DIGITS_REGEX).default(NO_SHIPPING_FLAT),
+      rate: z.number().default(0),
     }),
     z.object({
       kind: z.literal("percent"),
-      rate: z.string().endsWith("%").default(NO_SHIPPING_RATE),
+      rate: z.number().default(0),
     }),
   ]),
   lineItems: z.array(lineItemSchema),

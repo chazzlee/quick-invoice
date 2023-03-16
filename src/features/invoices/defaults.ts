@@ -3,7 +3,6 @@ import {
   GeneralDetailsSchema,
   InvoiceFormSchema,
   LineItemSchema,
-  NO_SHIPPING_FLAT,
 } from "@/schemas";
 
 export const defaultGeneralDetails: GeneralDetailsSchema = {
@@ -50,8 +49,8 @@ export const defaultInvoice: InvoiceFormSchema = {
     rate: 0,
   },
   shipping: {
-    kind: "no_shipping",
-    rate: NO_SHIPPING_FLAT,
+    kind: "none",
+    rate: 0,
   },
   lineItems: [defaultLineItem],
   balance: {

@@ -26,3 +26,11 @@ export type TaxType = typeof TAX_TYPES[number];
 
 export const DISCOUNT_TYPES = ["none", "percent", "flat_amount"] as const;
 export type DiscountType = typeof DISCOUNT_TYPES[number];
+
+export const SHIPPING_TYPES = [
+  "none",
+  "free",
+  "percent",
+  "flat_amount",
+] as const;
+export type ShippingType = typeof SHIPPING_TYPES[number];
