@@ -11,10 +11,10 @@ import { LineAmount } from "./LineAmount";
 import { LineTaxCheckbox } from "./LineTaxCheckbox";
 import { useShipping } from "@/features/invoices/hooks/useShipping";
 
-type LineItemProps = Readonly<{
+type LineItemProps = {
   index: number;
   onRemove(index: number): void;
-}>;
+};
 
 export function LineItem({ index, onRemove }: LineItemProps) {
   const {

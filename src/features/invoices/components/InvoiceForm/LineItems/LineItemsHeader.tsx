@@ -1,8 +1,8 @@
 import { useTax } from "@/features/invoices/hooks/useTax";
 
-type LineItemsHeaderProps = Readonly<{
+type LineItemsHeaderProps = {
   onClear(): void;
-}>;
+};
 
 export function LineItemsHeader({ onClear }: LineItemsHeaderProps) {
   const { isTaxable } = useTax();

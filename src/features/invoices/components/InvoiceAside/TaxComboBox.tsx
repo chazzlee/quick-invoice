@@ -1,12 +1,11 @@
 import type { ChangeEvent } from "react";
 import type { TaxType } from "../../types";
 import { Controller } from "react-hook-form";
-import { FormControl } from "@/components/Inputs";
+import { FormControl, PercentageInput } from "@/components/Inputs";
 import { selectTaxTypes } from "../../selectOptions";
 import { useTax } from "../../hooks/useTax";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
 import { useInvoiceFieldArray } from "../../hooks/useInvoiceFieldArray";
-import { PercentageInput } from "@/components/Inputs/PercentageInput";
 import { ComboBox } from "./ComboBox";
 
 export function TaxComboBox() {

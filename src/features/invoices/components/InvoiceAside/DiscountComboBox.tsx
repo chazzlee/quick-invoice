@@ -1,7 +1,5 @@
 import type { ChangeEvent } from "react";
-import { FormControl } from "@/components/Inputs";
-import { NumberInput } from "@/components/Inputs/NumberInput";
-import { PercentageInput } from "@/components/Inputs/PercentageInput";
+import { FormControl, NumberInput, PercentageInput } from "@/components/Inputs";
 import {
   valueInCentsFromPercentage,
   valueInPercentageFloatFromCents,

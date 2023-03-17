@@ -1,7 +1,7 @@
-import { Currency } from "@/components/Inputs/Currency";
+import { Currency } from "@/components/Inputs";
 import { useInvoiceWatchOne } from "@/features/invoices/hooks/useInvoiceWatchOne";
 
-type LineAmountProps = Readonly<{ index: number }>;
+type LineAmountProps = { index: number };
 
 export function LineAmount({ index }: LineAmountProps) {
   const amount = useInvoiceWatchOne(`lineItems.${index}.amount`);

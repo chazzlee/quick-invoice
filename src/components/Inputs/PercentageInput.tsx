@@ -2,14 +2,14 @@ import { forwardRef } from "react";
 import { NumericFormat } from "react-number-format";
 import { valueAsFloat, valueAsPercentage } from "@/utils/formats";
 
-type PercentageInputProps = Readonly<{
+type PercentageInputProps = {
   name: string;
   value: number;
   decimalScale?: number;
   hasError: boolean;
   onChange(value: number): void;
   onBlur(): void;
-}>;
+};
 
 export const PercentageInput = forwardRef<
   HTMLInputElement,

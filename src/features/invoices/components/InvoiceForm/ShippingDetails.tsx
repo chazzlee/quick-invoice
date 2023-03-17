@@ -11,7 +11,6 @@ export function ShippingDetails() {
     register,
     control,
     setValue,
-    resetField,
     formState: { errors },
   } = useInvoiceFormContext();
 

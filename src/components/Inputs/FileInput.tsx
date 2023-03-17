@@ -1,6 +1,6 @@
 import { type ComponentPropsWithRef, forwardRef } from "react";
 
-type FileInputProps = Readonly<ComponentPropsWithRef<"input"> & {}>;
+type FileInputProps = ComponentPropsWithRef<"input"> & {};
 
 export const FileInput = forwardRef<HTMLInputElement, FileInputProps>(
   function FileInput({ id, ...rest }, ref) {

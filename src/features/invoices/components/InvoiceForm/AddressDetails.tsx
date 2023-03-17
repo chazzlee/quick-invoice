@@ -7,7 +7,7 @@ import { selectStates } from "../../selectOptions";
 import { NumericFormat, PatternFormat } from "react-number-format";
 import { Controller } from "react-hook-form";
 
-type AddressDetailsProps = Readonly<{ id: "from" | "to" }>;
+type AddressDetailsProps = { id: "from" | "to" };
 
 // TODO: debounce, rethink trigger logic
 export function AddressDetails({ id }: AddressDetailsProps) {

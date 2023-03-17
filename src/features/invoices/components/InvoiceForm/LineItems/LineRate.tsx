@@ -2,7 +2,7 @@ import { Controller } from "react-hook-form";
 import { useInvoiceFormContext } from "@/features/invoices/hooks/useInvoiceFormContext";
 import { NumberInput } from "@/components/Inputs/NumberInput";
 
-type LineRateProps = Readonly<{ index: number }>;
+type LineRateProps = { index: number };
 
 export function LineRate({ index }: LineRateProps) {
   const { control } = useInvoiceFormContext();

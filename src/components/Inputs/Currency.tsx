@@ -1,11 +1,11 @@
 import { NumericFormat } from "react-number-format";
 import { valueInDollars } from "@/utils/formats";
 
-type CurrencyProps = Readonly<{
+type CurrencyProps = {
   amount: number;
   className?: string;
   type?: "text" | "input";
-}>;
+};
 
 export function Currency({
   amount,

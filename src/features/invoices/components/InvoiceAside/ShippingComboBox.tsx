@@ -1,12 +1,10 @@
 import { type ChangeEvent } from "react";
-import { FormControl } from "@/components/Inputs";
 import { Controller } from "react-hook-form";
-import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
+import { NumberInput, PercentageInput, FormControl } from "@/components/Inputs";
 import { useShipping } from "../../hooks/useShipping";
+import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
 import { selectShippingTypes } from "../../selectOptions";
 import { ComboBox } from "./ComboBox";
-import { PercentageInput } from "@/components/Inputs/PercentageInput";
-import { NumberInput } from "@/components/Inputs/NumberInput";
 import { ShippingType } from "../../types";
 import {
   valueInCentsFromPercentage,

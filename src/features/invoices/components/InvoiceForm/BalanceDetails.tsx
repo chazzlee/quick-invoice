@@ -1,11 +1,10 @@
-import { formatCurrency } from "@/utils/formatCurrency";
 import { useEffect } from "react";
 import { NumericFormat } from "react-number-format";
 import { useDiscount } from "../../hooks/useDiscount";
 import { useInvoiceFormContext } from "../../hooks/useInvoiceFormContext";
 import { useInvoiceWatchOne } from "../../hooks/useInvoiceWatchOne";
 import { useTax } from "../../hooks/useTax";
-import { Currency } from "@/components/Inputs/Currency";
+import { Currency } from "@/components/Inputs";
 import Money from "dinero.js";
 import { valueAsPercentage } from "@/utils/formats";
 import { useShipping } from "../../hooks/useShipping";
@@ -30,17 +29,13 @@ export function BalanceDetails() {
         .add(Money({ amount: Math.round(totalTax) }))
         .add(Money({ amount: Math.round(totalDiscount) }))
         .add(Money({ amount: Math.round(totalShipping) }));
+
       setValue("balance.total", total.getAmount());
+      setValue("balance.balanceDue", total.getAmount());
     }
 
     updateTotal();
   }, [setValue, subtotal, totalDiscount, totalTax, totalShipping]);
-
-  // useEffect(() => {
-  //   setValue("balance.balanceDue", total);
-  // }, [setValue, shipping.rate, subtotal, total, totalDiscount, totalTax]);
-
-  // TODO: move out -- need to update blaance after select change etc
 
   return (
     <div className="grid grid-cols-2 gap-8 pt-4">
@@ -108,7 +103,7 @@ export function BalanceDetails() {
         {/*  */}
         <div className="flex justify-between w-1/2">
           <p className="font-semibold">Balance Due</p>
-          <p className="font-semibold">{formatCurrency(balanceDue)}</p>
+          <Currency className="font-semibold" amount={balanceDue} />
         </div>
       </div>
     </div>

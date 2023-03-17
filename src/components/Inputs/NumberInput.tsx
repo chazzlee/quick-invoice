@@ -1,8 +1,8 @@
-import { valueInDollars, valueInMinorUnits } from "@/utils/formats";
 import { forwardRef } from "react";
+import { valueInDollars, valueInMinorUnits } from "@/utils/formats";
 import { NumericFormat } from "react-number-format";
 
-type NumberInputProps = Readonly<{
+type NumberInputProps = {
   id?: string;
   name: string;
   value: number;
@@ -10,7 +10,7 @@ type NumberInputProps = Readonly<{
   hasError?: boolean;
   width?: number;
   onChange(value: number): void;
-}>;
+};
 
 export const NumberInput = forwardRef<
   HTMLInputElement,
