@@ -40,7 +40,7 @@ const lineItemSchema = z.object({
 
 export const invoiceFormSchema = z.object({
   title: z.string().min(1, { message: "Invoice title is required" }).max(50),
-  logo: z.any(), //TODO:
+  logo: z.any().nullable(), //TODO:refine type (.instanceof(File) is not working)
   from: generalDetailsSchema,
   to: generalDetailsSchema,
   shipTo: generalDetailsSchema.optional(), //TODO:
