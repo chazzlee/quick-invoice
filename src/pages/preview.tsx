@@ -18,7 +18,7 @@ function Header({
       <div className="flex items-center gap-3">
         {logo ? (
           <Image
-            src={URL.createObjectURL(logo.item(0))}
+            src={URL.createObjectURL(logo)}
             alt="company logo"
             height={50}
             width={50}
@@ -164,7 +164,7 @@ function Balance({ balance }: { balance: any }) {
       </div>
       <div className="text-end">
         <div>{formatCurrency(balance.subtotal)}</div>
-        <div>-{formatCurrency(balance.totalDiscount)}</div>
+        <div>{formatCurrency(balance.totalDiscount)}</div>
         <div>{formatCurrency(balance.totalTax)}</div>
         <div>{formatCurrency(balance.total)}</div>
         <div>{formatCurrency(balance.balanceDue)}</div>
